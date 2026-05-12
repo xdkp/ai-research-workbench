@@ -1,0 +1,45 @@
+# AI Research Workbench meta-repo ignore rules.
+#
+# This root repo tracks only workspace-level onboarding, docs, and helper
+# scripts. Each project below keeps its own Git history.
+
+# Child repositories
+/Fabric/
+/cc-switch/
+/csp-audit/
+/hermes-agent/
+/oh-my-claudecode/
+
+# Local agent/editor config
+/.agents/
+/.codex/
+/.claude/
+/.vscode/
+/.idea/
+
+# Heavy generated caches and build output
+node_modules/
+.next/
+dist/
+build/
+target/
+.turbo/
+.cache/
+.pnpm-store/
+
+# Logs and temporary output
+*.log
+*.tmp
+tmp/
+temp/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*~
+
