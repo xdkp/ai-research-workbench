@@ -25,12 +25,14 @@ run_check() {
 run_check "Paths" "$ROOT/scripts/check-paths.sh"
 run_check "Tools" "$ROOT/scripts/check-tools.sh"
 run_check "Projects" "$ROOT/scripts/check-projects.sh"
+run_check "Repositories" "$ROOT/scripts/check-repos.sh"
 
 printf '\n== Recommended next docs ==\n'
 printf '%s\n' \
   'START_HERE.md' \
   'docs/onboarding/new-machine-setup.md' \
   'docs/stack-map/component-map.md' \
+  'docs/stack-map/repository-manifest.md' \
   'docs/stack-map/config-ownership.md' \
   'docs/integrations/hermes-with-csp-audit.md'
 

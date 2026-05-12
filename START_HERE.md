@@ -58,7 +58,13 @@ docs/onboarding/new-machine-setup.md
 ./scripts/doctor.sh
 ```
 
-6. Work from the repo that owns the task:
+6. Check the repository map:
+
+```bash
+./scripts/check-repos.sh
+```
+
+7. Work from the repo that owns the task:
 
 ```text
 Security workflow / reports  -> csp-audit
@@ -84,11 +90,13 @@ Do not introduce Kubernetes yet. Use native tools first and Docker Compose later
 - Build partition: `/mnt/develop`
 - Old NTFS/archive partition, if mounted: `/mnt/new_volume`
 - `cc-switch/src-tauri/target` can grow very large. Treat it as disposable Rust build cache.
-- The workspace root currently has an empty `.git` directory. Do not rely on root Git tracking until that is intentionally fixed.
+- The workspace root is a meta-repo and intentionally ignores the child project repositories.
+- Root GitHub remote: `https://github.com/xdkp/ai-research-workbench.git`
 
 ## Next Docs
 
 - `docs/stack-map/component-map.md`
+- `docs/stack-map/repository-manifest.md`
 - `docs/stack-map/command-map.md`
 - `docs/stack-map/config-ownership.md`
 - `docs/stack-map/env-var-inventory.md`

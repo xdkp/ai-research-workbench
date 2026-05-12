@@ -48,6 +48,27 @@ AI_Research/
 ./scripts/check-paths.sh
 ./scripts/check-tools.sh
 ./scripts/doctor.sh
+./scripts/check-repos.sh
 ```
 
 The scripts are read-only. They do not install dependencies, log into accounts, or print secrets.
+
+## Repository Model
+
+This root folder is a meta-repo. It tracks the workbench docs and scripts only.
+
+The project folders keep their own Git histories:
+
+```text
+Fabric/
+cc-switch/
+csp-audit/
+hermes-agent/
+oh-my-claudecode/
+```
+
+See:
+
+```text
+docs/stack-map/repository-manifest.md
+```

@@ -14,16 +14,16 @@ This document records the current state of the combined AI Research Workbench so
 
 The workspace root is now a valid Git repository.
 
-Current root commit:
+Current committed baseline before repository-manifest updates:
 
 ```text
-06e7da1 Add AI Research Workbench onboarding layer
+825665c Add current workspace status snapshot
 ```
 
-Current root status:
+Root remote:
 
 ```text
-clean before this status document was added
+https://github.com/xdkp/ai-research-workbench.git
 ```
 
 The root repository is a meta-layer only. It tracks shared onboarding, integration docs, and read-only health scripts. It does not own the source history of the child projects.
