@@ -72,3 +72,11 @@ See:
 ```text
 docs/stack-map/repository-manifest.md
 ```
+
+## Planning Archive
+
+Historical workbench planning records are archived here:
+
+```text
+docs/plans/README.md
+```

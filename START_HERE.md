@@ -95,6 +95,7 @@ Do not introduce Kubernetes yet. Use native tools first and Docker Compose later
 
 ## Next Docs
 
+- `docs/plans/README.md`
 - `docs/stack-map/component-map.md`
 - `docs/stack-map/repository-manifest.md`
 - `docs/stack-map/command-map.md`

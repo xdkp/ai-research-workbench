@@ -19,7 +19,7 @@ The manifest gives the workspace a stable map without forcing a monorepo migrati
 | Path | `/mnt/develop/AI_Research` |
 | Purpose | Shared onboarding, integration docs, and health scripts |
 | Branch | `master` |
-| Current commit | `825665c Add current workspace status snapshot` |
+| Current commit | `62127f2 Add repository manifest and repo health check` |
 | Origin | `https://github.com/xdkp/ai-research-workbench.git` |
 | Tracks child source code | No |
 
@@ -37,10 +37,10 @@ oh-my-claudecode/
 
 | Repo | Branch | Current commit | Primary remote | Current state |
 | --- | --- | --- | --- | --- |
-| `Fabric` | `main` | `6a9b55a0 chore(release): Update version to v1.4.452` | `https://github.com/danielmiessler/Fabric.git` | Dirty, 772 changed/untracked entries |
+| `Fabric` | `main` | `6a9b55a0 chore(release): Update version to v1.4.452` | `https://github.com/danielmiessler/Fabric.git` | Clean |
 | `cc-switch` | `main` | `1af92d7b fix(clippy): resolve all 12 clippy 1.95 warnings to pass CI` | `https://github.com/xdkp/cc-switch-custom.git` | Clean |
-| `csp-audit` | `develop` | `fdf5f7f Phase 12: Add engagement lifecycle controls` | `https://github.com/xdkp/csp-audit.git` | Dirty, 20 changed/untracked entries |
-| `hermes-agent` | `main` | `ebf2ea584 feat(terminal,cli): docker_extra_args + display.timestamps` | `https://github.com/NousResearch/hermes-agent.git` | Dirty, 4 changed/untracked entries |
+| `csp-audit` | `develop` | `2a1d7b3 Harden task controls and update Next security patch` | `https://github.com/xdkp/csp-audit.git` | Clean |
+| `hermes-agent` | `main` | `ebf2ea584 feat(terminal,cli): docker_extra_args + display.timestamps` | `https://github.com/NousResearch/hermes-agent.git` | Clean |
 | `oh-my-claudecode` | `main` | `0ac52cda Merge main back into dev for release sync` | `https://github.com/Yeachan-Heo/oh-my-claudecode.git` | Clean |
 
 ## Additional Remotes
@@ -69,6 +69,8 @@ scripts/
 
 Do not force the child repositories into the root repo.
 
+Planning archive: `docs/plans/README.md`.
+
 ### `csp-audit`
 
 This is the active product/control plane. Continue development here for:
@@ -87,20 +89,13 @@ Do not reset current changes.
 
 ### `hermes-agent`
 
-Use as orchestration/runtime support. Current local docs are audit and integration planning notes.
+Use as orchestration/runtime support. Do not store local workbench planning docs inside this upstream clone.
 
-Do not restructure upstream code until the integration contract with `csp-audit` is clearer.
+Workbench planning records live in `docs/plans/` at the root meta-repo.
 
 ### `Fabric`
 
-Current dirty state is large. Inspect before keeping, committing, or reverting anything.
-
-Likely next checks:
-
-```bash
-git -C /mnt/develop/AI_Research/Fabric diff --stat
-git -C /mnt/develop/AI_Research/Fabric status --short
-```
+Current state is clean. Keep it clean unless a deliberate upstream contribution branch is opened.
 
 ### `cc-switch`
 

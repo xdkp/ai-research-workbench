@@ -14,10 +14,10 @@ This document records the current state of the combined AI Research Workbench so
 
 The workspace root is now a valid Git repository.
 
-Current committed baseline before repository-manifest updates:
+Current committed baseline before planning archive updates:
 
 ```text
-825665c Add current workspace status snapshot
+62127f2 Add repository manifest and repo health check
 ```
 
 Root remote:
@@ -26,7 +26,7 @@ Root remote:
 https://github.com/xdkp/ai-research-workbench.git
 ```
 
-The root repository is a meta-layer only. It tracks shared onboarding, integration docs, and read-only health scripts. It does not own the source history of the child projects.
+The root repository is a meta-layer only. It tracks shared onboarding, integration docs, archived planning records, and read-only health scripts. Historical planning records are archived in `docs/plans/`. It does not own the source history of the child projects.
 
 Tracked workspace layer:
 
@@ -34,6 +34,7 @@ Tracked workspace layer:
 README.md
 START_HERE.md
 docs/
+  docs/plans/
 scripts/
 .gitignore
 ```
@@ -72,9 +73,9 @@ scope
 
 | Project | Role | Ownership status |
 | --- | --- | --- |
-| `csp-audit` | Security control plane, scans, findings, approvals, report viewer, DAST gate | Active local development |
-| `hermes-agent` | Agent runtime, orchestration, skills, gateway, CLI/TUI/web surfaces | Upstream clone with local planning docs |
-| `Fabric` | Prompt/pattern library and analysis patterns | Upstream clone, currently dirty |
+| `csp-audit` | Security control plane, scans, findings, approvals, report viewer, DAST gate | Active local development, currently clean after hardening commits |
+| `hermes-agent` | Agent runtime, orchestration, skills, gateway, CLI/TUI/web surfaces | Upstream clone, keep clean |
+| `Fabric` | Prompt/pattern library and analysis patterns | Upstream clone, keep clean |
 | `cc-switch` | Claude Code / Codex style switching and local helper tooling | Clean child repo, has large Rust build cache |
 | `oh-my-claudecode` | Claude Code configuration/plugin reference | Clean child repo |
 
@@ -85,16 +86,16 @@ scope
 Current status:
 
 ```text
-772 changed/untracked entries
+clean
 ```
 
 Handling rule:
 
 ```text
-Do not commit, revert, or clean Fabric yet.
+Keep Fabric clean unless an explicit upstream contribution branch is opened.
 ```
 
-The change set is large and should be inspected separately before any action. Treat it as unrelated to the current workspace onboarding layer.
+Earlier line-ending noise was cleaned. Do not reintroduce mechanical diffs.
 
 ### `cc-switch`
 
@@ -130,10 +131,10 @@ Do not clean it automatically during normal workspace checks.
 Current status:
 
 ```text
-20 changed/untracked entries
+clean
 ```
 
-Known local work:
+Recently completed local work:
 
 ```text
 control-plane hardening
@@ -152,29 +153,20 @@ Handling rule:
 This repo is active work. Do not reset or discard changes.
 ```
 
-Vercel account/project work remains paused.
+Vercel account/project work remains paused, but local tests/builds and control-plane hardening are committed.
 
 ### `hermes-agent`
 
 Current status:
 
 ```text
-4 changed/untracked entries
-```
-
-Known local work:
-
-```text
-ui-tui/packages/hermes-ink/package-lock.json
-web/package-lock.json
-docs/plans/2026-05-11-project-structure-and-docs-cleanup.md
-docs/plans/2026-05-11-ai-research-workbench-deep-audit.md
+clean
 ```
 
 Handling rule:
 
 ```text
-Treat this as an upstream clone plus local audit notes. Do not restructure upstream code directly yet.
+Treat this as an upstream clone. Keep workbench planning docs in the root meta-repo under docs/plans/.
 ```
 
 ### `oh-my-claudecode`
