@@ -75,3 +75,28 @@ completed summary
 Agent-generated text is draft material until the operator confirms it in `csp-audit`.
 
 Final report content should come from approved/confirmed csp-audit records, not from Hermes memory alone.
+
+## First Local Proof Workflow
+
+Before wiring a long-running Hermes worker, prove the local stack in this order:
+
+```text
+1. Run the workbench doctor.
+2. Run csp-audit tests and report-viewer checks.
+3. Start report-viewer locally at http://127.0.0.1:3000.
+4. Create or inspect a scoped csp-audit task locally.
+5. Use Hermes/Fabric only to draft analysis or report material.
+6. Save approved evidence, findings, and final report material back in csp-audit.
+```
+
+Current local proof result, checked 2026-05-12:
+
+```text
+PASS  doctor and toolchain checks
+PASS  csp-audit tests
+PASS  report-viewer lint, vitest, and build
+PASS  local report-viewer HTTP probe
+WARN  ops:validate still expects Vercel/env setup that is intentionally paused
+```
+
+Do not use Hermes memory, Fabric output, or local notes as the final report source. They are draft inputs. `csp-audit` remains the durable record for task state, evidence, findings, approvals, and report output.

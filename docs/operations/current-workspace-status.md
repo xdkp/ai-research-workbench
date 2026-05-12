@@ -14,10 +14,10 @@ This document records the current state of the combined AI Research Workbench so
 
 The workspace root is now a valid Git repository.
 
-Current committed baseline before this tool-status update:
+Current committed baseline before local workflow proof update:
 
 ```text
-5d963ad Document Ollama local model runtime
+46e7e1b Update workbench tool status
 ```
 
 Root remote:
@@ -154,7 +154,44 @@ Handling rule:
 This repo is active work. Do not reset or discard changes.
 ```
 
-Vercel account/project work remains paused, but local tests/builds and control-plane hardening are committed.
+Vercel account/project work remains paused, but local tests/builds, report-viewer build, and control-plane hardening are committed or verified locally.
+
+Latest local workflow proof, checked 2026-05-12:
+
+```text
+PASS  ./scripts/doctor.sh
+PASS  hermes --help
+PASS  fabric --version
+PASS  go version
+PASS  uv --version
+PASS  ffmpeg -version
+PASS  pnpm test
+PASS  pnpm --prefix report-viewer lint
+PASS  pnpm --prefix report-viewer exec vitest run
+PASS  pnpm --prefix report-viewer build
+PASS  report-viewer local HTTP probe: HTTP/1.1 200 OK at http://127.0.0.1:3000
+WARN  ollama daemon not reachable
+FAIL  pnpm ops:validate due account/env prerequisites intentionally not configured
+```
+
+`pnpm ops:validate` failed on these expected local/deployment setup items:
+
+```text
+report-viewer/.vercel/project.json missing
+REPORT_VIEWER_BASE_URL not set
+SCAN_WORKER_TOKEN not set
+AGENT_TOKEN warning/state check
+```
+
+Do not fix the Vercel-linked validation item until Vercel work is intentionally resumed. `SCAN_WORKER_TOKEN` is only needed when running a local scan worker or agent integration.
+
+Current local report-viewer dev server:
+
+```text
+URL: http://127.0.0.1:3000
+Command: pnpm --prefix report-viewer dev --hostname 127.0.0.1 --port 3000
+Primary process observed: 232259
+```
 
 ### `hermes-agent`
 
@@ -352,10 +389,10 @@ do not move Docker root data onto /mnt/develop yet
 
 Recommended next sequence:
 
-1. Commit this status document in the workspace meta-repo.
-2. Add a top-level `docs/operations/project-state-ledger.md` if child repo state needs to be tracked over time.
-3. Inspect `csp-audit` local changes and decide the next implementation milestone.
-4. Inspect `hermes-agent` lockfile changes before keeping or discarding them.
-5. Inspect why `Fabric` has a large dirty tree before using it as an integration dependency.
-6. Decide whether to install `hermes` and `fabric` commands into the `/mnt/develop` toolchain path.
+1. Keep Vercel paused and continue local `csp-audit` development.
+2. Configure `SCAN_WORKER_TOKEN` only when starting local worker or Hermes task-claim integration.
+3. Use `docs/integrations/hermes-with-csp-audit.md` as the next implementation contract.
+4. Prove one local approved-task style workflow before adding deployment services.
+5. Start Ollama only when a local model task needs it.
+6. Keep upstream clones clean unless an explicit upstream contribution branch is opened.
 
