@@ -14,10 +14,10 @@ This document records the current state of the combined AI Research Workbench so
 
 The workspace root is now a valid Git repository.
 
-Current committed baseline before planning archive updates:
+Current committed baseline before this tool-status update:
 
 ```text
-62127f2 Add repository manifest and repo health check
+5d963ad Document Ollama local model runtime
 ```
 
 Root remote:
@@ -77,7 +77,7 @@ scope
 | `hermes-agent` | Agent runtime, orchestration, skills, gateway, CLI/TUI/web surfaces | Upstream clone, keep clean |
 | `Fabric` | Prompt/pattern library and analysis patterns | Upstream clone, keep clean |
 | `cc-switch` | Claude Code / Codex style switching and local helper tooling | Clean child repo, has large Rust build cache |
-| `Ollama` | Local model runtime and model storage | Installed; daemon was not running when checked |
+| `Ollama` | Local model runtime and model storage | Client installed; daemon was not running when checked |
 | `oh-my-claudecode` | Claude Code configuration/plugin reference | Clean child repo |
 
 ## Current Child Repo State
@@ -246,33 +246,54 @@ rg
 node
 pnpm
 python3
+uv
+go
+cargo
+ffmpeg
 ```
 
 Useful tools currently found:
 
 ```text
-cargo
 gh
 vercel
 docker
 ollama
+hermes
+fabric
+```
+
+Current user-scoped tool installs:
+
+```text
+uv      -> /home/m0bious/.local/bin/uv
+go      -> /home/m0bious/.local/bin/go -> /mnt/develop/tools/go/bin/go
+ffmpeg  -> /home/m0bious/.local/bin/ffmpeg -> /mnt/develop/tools/ffmpeg-venv managed binary
+hermes  -> /home/m0bious/.local/bin/hermes, installed by uv tool from local hermes-agent clone
+fabric  -> /home/m0bious/.local/bin/fabric, built from local Fabric clone
+```
+
+Current versions checked:
+
+```text
+uv 0.11.13
+go version go1.26.3 linux/amd64
+ffmpeg 7.0.2-static
+fabric v1.4.452
+hermes command available
 ```
 
 Optional tools missing or not on `PATH`:
 
 ```text
-uv
-go
-ffmpeg
-hermes
-fabric
+none from the current workbench doctor list
 ```
 
 Notes:
 
 - `vercel` is installed, but Vercel account/project actions are paused.
-- `hermes` and `fabric` may exist as source repos but are not currently installed as shell commands.
-- Missing optional tools should not block `csp-audit` development unless a specific task needs them.
+- `ollama` is installed, but the local daemon was not reachable during the latest check.
+- `go` caches are configured under `/mnt/develop/build-cache/go` so module/build cache growth stays on the ext4 development partition.
 
 ## Vercel Status
 
