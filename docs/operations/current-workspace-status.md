@@ -190,7 +190,7 @@ Current local report-viewer dev server:
 ```text
 URL: http://127.0.0.1:3000
 Command: pnpm --prefix report-viewer dev --hostname 127.0.0.1 --port 3000
-Primary process observed: 232259
+Primary process observed: 236570
 ```
 
 ### `hermes-agent`
