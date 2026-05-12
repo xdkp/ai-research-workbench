@@ -36,9 +36,21 @@ cc-switch/src-tauri/target/
 .ruff_cache/
 ```
 
-## Known Large Path
+Large local model/data storage:
+
+```text
+/mnt/develop/ollama-models/
+/mnt/develop/Models/
+/mnt/develop/datasets/
+```
+
+These paths are allowed to be large. They are not Git source and should be backed up only when the model/data files are intentionally worth preserving.
+
+## Known Large Paths
 
 `cc-switch/src-tauri/target` can become very large. It was observed around 37G.
+
+`/mnt/develop/ollama-models` is the preferred local model store for Ollama. It was empty when checked on 2026-05-12, but model pulls can grow quickly.
 
 It is Rust/Tauri build output and should be treated as disposable cache.
 
@@ -52,6 +64,6 @@ Do not run cleanup commands while builds are active.
 
 ## Backup Guidance
 
-Back up source, docs, configs, and approved evidence/reports.
+Back up source, docs, configs, approved evidence/reports, and any local models or datasets you cannot easily re-pull.
 
 Do not waste backup space on generated dependency/build caches unless you intentionally want fast restore.

@@ -21,6 +21,7 @@ The other projects support that workflow:
 | `hermes-agent` | Agent runtime and long-running executor for approved work |
 | `Fabric` | Reusable prompt-pattern and analysis library |
 | `cc-switch` | Provider/profile switchboard for AI coding CLIs |
+| `Ollama` | Local model runtime for optional local inference |
 | `oh-my-claudecode` | Claude Code customization/support tooling |
 | `.agents` / `.codex` | Local assistant metadata and workspace config |
 
@@ -71,6 +72,7 @@ Security workflow / reports  -> csp-audit
 Agent runtime / gateway      -> hermes-agent
 Prompt patterns              -> Fabric
 Provider/profile switching   -> cc-switch
+Local model runtime          -> Ollama
 Claude Code customization    -> oh-my-claudecode
 ```
 
@@ -90,6 +92,7 @@ Do not introduce Kubernetes yet. Use native tools first and Docker Compose later
 - Build partition: `/mnt/develop`
 - Old NTFS/archive partition, if mounted: `/mnt/new_volume`
 - `cc-switch/src-tauri/target` can grow very large. Treat it as disposable Rust build cache.
+- Ollama model storage target: `/mnt/develop/ollama-models`.
 - The workspace root is a meta-repo and intentionally ignores the child project repositories.
 - Root GitHub remote: `https://github.com/xdkp/ai-research-workbench.git`
 

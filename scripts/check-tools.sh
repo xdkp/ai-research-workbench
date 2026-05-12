@@ -33,9 +33,21 @@ for tool in uv go cargo ffmpeg gh vercel docker ollama hermes fabric; do
 done
 
 printf '\nVersions\n'
-for cmd in 'node --version' 'pnpm --version' 'python3 --version' 'git --version' 'go version' 'cargo --version' 'gh --version' 'vercel --version' 'docker --version'; do
+for cmd in 'node --version' 'pnpm --version' 'python3 --version' 'git --version' 'go version' 'cargo --version' 'gh --version' 'vercel --version' 'docker --version' 'ollama --version'; do
   printf '$ %s\n' "$cmd"
   $cmd 2>/dev/null | head -2 || true
 done
+
+
+printf '
+Ollama daemon
+'
+if command -v ollama >/dev/null 2>&1; then
+  if ollama list >/dev/null 2>&1; then
+    ok "ollama daemon reachable"
+  else
+    warn "ollama installed but daemon is not reachable"
+  fi
+fi
 
 exit "$status"

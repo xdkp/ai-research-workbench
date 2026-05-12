@@ -21,6 +21,8 @@ Run commands from the listed directory unless noted.
 | cc-switch unit tests | `pnpm test:unit` | `cc-switch` | If deps installed |
 | GitHub auth check | `gh auth status` | any | External auth check |
 | Vercel CLI check | `vercel --version` | any | Only needed for Vercel work |
+| Ollama CLI check | `ollama --version` | any | Confirms client is installed |
+| Ollama daemon check | `ollama list` | any | Confirms local daemon is reachable |
 
 ## Local-First Rule
 

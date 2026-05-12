@@ -9,6 +9,17 @@ This is the workspace-level index. Do not paste real secrets here.
 |---|---|---:|---|
 | Provider API key | Hermes or cc-switch | yes | Depends on selected model/provider |
 | `HERMES_HOME` | Hermes | optional | Only if overriding default config path |
+| `OLLAMA_HOST` | Ollama/client tools | optional | Only if not using the default local endpoint |
+| `OLLAMA_MODELS` | Ollama | recommended if storing models on `/mnt/develop` | Target: `/mnt/develop/ollama-models` |
+
+## Ollama Local Models
+
+| Variable | Owner | Required? | Notes |
+|---|---|---:|---|
+| `OLLAMA_MODELS` | Ollama service | recommended | Use `/mnt/develop/ollama-models` so large model files stay on the ext4 dev partition |
+| `OLLAMA_HOST` | Ollama clients | optional | Use only when the daemon is not on the default local endpoint |
+
+Ollama hosts local model files and inference. It does not own security tasks, evidence, approvals, findings, or reports.
 
 ## csp-audit Local-Only
 

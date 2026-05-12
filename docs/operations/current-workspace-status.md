@@ -67,7 +67,7 @@ scope
 -> report export
 ```
 
-`csp-audit` is the system of record for this workflow. Hermes, Fabric, cc-switch, Codex, and Claude Code are support tools around that control plane.
+`csp-audit` is the system of record for this workflow. Hermes, Fabric, cc-switch, Ollama, Codex, and Claude Code are support tools around that control plane.
 
 ## Child Project Roles
 
@@ -77,6 +77,7 @@ scope
 | `hermes-agent` | Agent runtime, orchestration, skills, gateway, CLI/TUI/web surfaces | Upstream clone, keep clean |
 | `Fabric` | Prompt/pattern library and analysis patterns | Upstream clone, keep clean |
 | `cc-switch` | Claude Code / Codex style switching and local helper tooling | Clean child repo, has large Rust build cache |
+| `Ollama` | Local model runtime and model storage | Installed; daemon was not running when checked |
 | `oh-my-claudecode` | Claude Code configuration/plugin reference | Clean child repo |
 
 ## Current Child Repo State
@@ -167,6 +168,22 @@ Handling rule:
 
 ```text
 Treat this as an upstream clone. Keep workbench planning docs in the root meta-repo under docs/plans/.
+```
+
+### `Ollama`
+
+Current tool state:
+
+```text
+client installed: 0.23.1
+daemon status when checked: not reachable
+preferred model path: /mnt/develop/ollama-models
+```
+
+Handling rule:
+
+```text
+Use Ollama as optional local inference runtime only. Do not store task state, evidence, findings, approvals, or reports in Ollama.
 ```
 
 ### `oh-my-claudecode`

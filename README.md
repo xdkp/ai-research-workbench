@@ -9,7 +9,7 @@ The core workflow is:
 scope -> approved task -> execution evidence -> structured finding -> operator triage -> final report/export
 ```
 
-`csp-audit` is the source of truth for security workflow state. Hermes, Fabric, cc-switch, Codex, and Claude Code support that workflow.
+`csp-audit` is the source of truth for security workflow state. Hermes, Fabric, cc-switch, Ollama, Codex, and Claude Code support that workflow.
 
 Start here:
 
@@ -40,6 +40,7 @@ AI_Research/
 | `hermes-agent` | Agent runtime, CLI/TUI, gateway, memory, skills, tools |
 | `Fabric` | Prompt-pattern library for repeatable analysis and writing workflows |
 | `cc-switch` | Provider/profile switching for AI CLI tools |
+| `Ollama` | Optional local model runtime for local inference |
 | `oh-my-claudecode` | Claude Code customization/support tooling |
 
 ## Health Checks

@@ -7,6 +7,7 @@
 | `hermes-agent` | Agent runtime and executor | Python, Node extras | `hermes`, `hermes gateway` | Hermes config/env | Agent CLI/TUI, gateway, skills, memory |
 | `Fabric` | Prompt-pattern library | Go, Markdown patterns | `fabric` | Fabric config | Reusable analysis/writing prompts |
 | `cc-switch` | Provider/profile switchboard | Tauri, TypeScript, Rust | desktop app / Tauri | cc-switch profile DB/config | Model/provider routing for coding CLIs |
+| `Ollama` | Local model runtime | Go service / local HTTP API | `ollama serve`, `ollama list` | Ollama env/service config | Optional local inference for Hermes/Fabric/Codex-compatible flows |
 | `oh-my-claudecode` | Claude Code support/customization | Node/TypeScript | project scripts | local Claude Code config | Claude Code workflow customization |
 | `.codex` | Codex local config | local metadata | Codex | local-only | Codex behavior and workspace context |
 | `.agents` | Agent workspace metadata | local metadata | local agents | local-only | Agent workspace context |
@@ -19,4 +20,4 @@ For security work, `csp-audit` owns final state:
 engagements -> tasks -> events/evidence -> findings -> triage -> reports/submissions
 ```
 
-Other tools can generate ideas, analysis, commands, draft text, and evidence material. They should not become the authoritative finding store.
+Other tools can generate ideas, analysis, commands, draft text, and evidence material. Ollama can host local models for those tools. None of them should become the authoritative finding store.
