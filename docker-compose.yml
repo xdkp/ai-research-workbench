@@ -1,0 +1,93 @@
+services:
+  csp-report-viewer:
+    build:
+      context: ./csp-audit/report-viewer
+      dockerfile: Dockerfile
+    image: ai-research-workbench/csp-report-viewer:local
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      SUPABASE_URL: ${SUPABASE_URL:-https://your-project.supabase.co}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-replace-me}
+      SUPABASE_REQUEST_TIMEOUT_MS: ${SUPABASE_REQUEST_TIMEOUT_MS:-8000}
+      REPORT_VIEWER_BASE_URL: ${REPORT_VIEWER_BASE_URL:-http://localhost:3000}
+      SCAN_WORKER_TOKEN: ${SCAN_WORKER_TOKEN:-replace-me}
+      AGENT_TOKEN: ${AGENT_TOKEN:-replace-me}
+      VIEWER_BASIC_AUTH_USER: ${VIEWER_BASIC_AUTH_USER:-}
+      VIEWER_BASIC_AUTH_PASSWORD: ${VIEWER_BASIC_AUTH_PASSWORD:-}
+      VIEWER_SESSION_SECRET: ${VIEWER_SESSION_SECRET:-}
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3000').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    profiles:
+      - csp-audit
+      - hermes-gateway
+
+  csp-scan-worker:
+    build:
+      context: ./csp-audit
+      dockerfile: Dockerfile.worker
+    image: ai-research-workbench/csp-scan-worker:local
+    depends_on:
+      csp-report-viewer:
+        condition: service_healthy
+    environment:
+      REPORT_VIEWER_BASE_URL: http://csp-report-viewer:3000
+      SCAN_WORKER_TOKEN: ${SCAN_WORKER_TOKEN:-replace-me}
+      SCAN_BASIC_AUTH_USER: ${SCAN_BASIC_AUTH_USER:-}
+      SCAN_BASIC_AUTH_PASSWORD: ${SCAN_BASIC_AUTH_PASSWORD:-}
+      VERCEL_AUTOMATION_BYPASS_SECRET: ${VERCEL_AUTOMATION_BYPASS_SECRET:-}
+      SCAN_WORKER_IDLE_SECONDS: ${SCAN_WORKER_IDLE_SECONDS:-30}
+    restart: unless-stopped
+    init: true
+    profiles:
+      - csp-audit
+
+  hermes-gateway:
+    build:
+      context: ./hermes-agent
+      dockerfile: Dockerfile.gateway
+    image: ai-research-workbench/hermes-gateway:local
+    depends_on:
+      csp-report-viewer:
+        condition: service_healthy
+    environment:
+      HERMES_HOME: /data/hermes
+      AGENT_TOKEN: ${AGENT_TOKEN:-replace-me}
+      CSP_AUDIT_BASE_URL: http://csp-report-viewer:3000
+      CSP_AUDIT_AGENT_NAME: ${CSP_AUDIT_AGENT_NAME:-hermes-gateway}
+      CSP_AUDIT_AGENT_MODEL: ${CSP_AUDIT_AGENT_MODEL:-hermes-gateway}
+      CSP_AUDIT_AGENT_PROFILE: ${CSP_AUDIT_AGENT_PROFILE:-default}
+      CSP_AUDIT_HEARTBEAT_INTERVAL_SECONDS: ${CSP_AUDIT_HEARTBEAT_INTERVAL_SECONDS:-30}
+      CSP_AUDIT_TASK_POLL_ENABLED: ${CSP_AUDIT_TASK_POLL_ENABLED:-false}
+      CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS: ${CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS:-60}
+      CSP_AUDIT_TASK_EXECUTION_MODE: ${CSP_AUDIT_TASK_EXECUTION_MODE:-receipt}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
+      SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-}
+      WHATSAPP_BOT_TOKEN: ${WHATSAPP_BOT_TOKEN:-}
+      SIGNAL_BOT_TOKEN: ${SIGNAL_BOT_TOKEN:-}
+      MATRIX_BOT_TOKEN: ${MATRIX_BOT_TOKEN:-}
+      MATTERMOST_BOT_TOKEN: ${MATTERMOST_BOT_TOKEN:-}
+      EMAIL_BOT_TOKEN: ${EMAIL_BOT_TOKEN:-}
+      WEBHOOK_TOKEN: ${WEBHOOK_TOKEN:-}
+    volumes:
+      - hermes-home:/data/hermes
+    restart: unless-stopped
+    init: true
+    profiles:
+      - hermes-gateway
+
+volumes:
+  hermes-home:

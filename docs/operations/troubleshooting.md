@@ -25,12 +25,13 @@ Do not assume root-level docs are tracked by Git unless a valid root repo is cre
 
 If Preview DAST secrets are missing, csp-audit CI should skip Preview DAST cleanly.
 
-If deploy is intended, check:
+If deploy or production DAST is intended, check:
 
 ```text
 VERCEL_TOKEN
 VERCEL_ORG_ID
 VERCEL_PROJECT_ID
+REPORT_VIEWER_BASE_URL repository variable
 report-viewer root directory
 ```
 

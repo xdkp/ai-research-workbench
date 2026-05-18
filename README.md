@@ -17,6 +17,20 @@ Start here:
 START_HERE.md
 ```
 
+## Implementation Status
+
+The workspace-level operating layer is in place and the current implementation state is:
+
+- P0: completed enough to avoid the known confusion points in normal use.
+- P1: complete, with the root front door and workspace docs in place.
+- P2: complete, with integration boundaries documented.
+- P3: complete, with read-only workspace checks and the doctor wired up.
+- P4: in progress, with the csp-audit Compose service group now including the report viewer and scan worker and a Hermes gateway profile that seeds credentials and emits csp-audit heartbeats.
+
+The detailed source of truth for status is `docs/operations/current-workspace-status.md`.
+
+The initial Docker Compose entry point is `docker-compose.yml`.
+
 ## Workspace Layout
 
 ```text

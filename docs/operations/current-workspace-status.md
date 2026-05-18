@@ -10,6 +10,17 @@ Workspace root:
 
 This document records the current state of the combined AI Research Workbench so future changes do not have to rediscover the same layout, ownership, and risks.
 
+## Implementation Phase
+
+Current implementation status:
+
+```text
+P1 complete: workspace front door and docs exist
+P2 complete: integration contracts exist
+P3 complete: read-only health checks exist and pass
+P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and Hermes gateway; heartbeat/task bridge processes are wired, but live agent API calls currently return 500 because the report viewer cannot reach Supabase before timeout
+```
+
 ## Workspace Meta-Repo
 
 The workspace root is now a valid Git repository.
@@ -73,8 +84,8 @@ scope
 
 | Project | Role | Ownership status |
 | --- | --- | --- |
-| `csp-audit` | Security control plane, scans, findings, approvals, report viewer, DAST gate | Active local development, currently clean after hardening commits |
-| `hermes-agent` | Agent runtime, orchestration, skills, gateway, CLI/TUI/web surfaces | Upstream clone, keep clean |
+| `csp-audit` | Security control plane, scans, findings, approvals, report viewer, DAST gate | Active local development; local P4 bridge changes pending verification/commit |
+| `hermes-agent` | Agent runtime, orchestration, skills, gateway, CLI/TUI/web surfaces | Upstream clone plus local Docker gateway integration files; do not push upstream casually |
 | `Fabric` | Prompt/pattern library and analysis patterns | Upstream clone, keep clean |
 | `cc-switch` | Claude Code / Codex style switching and local helper tooling | Clean child repo, has large Rust build cache |
 | `Ollama` | Local model runtime and model storage | Client installed; daemon was not running when checked |
@@ -132,7 +143,16 @@ Do not clean it automatically during normal workspace checks.
 Current status:
 
 ```text
-clean
+local P4 integration changes pending verification/commit
+```
+
+Current local P4 work:
+
+```text
+claim_next_agent_task RPC contract fixed to use p_agent_name
+empty task queue now returns { task: null } consistently
+agent claim route tests and Supabase claim helper tests added
+Docker report-viewer image needs rebuild before running container uses these code changes
 ```
 
 Recently completed local work:
@@ -156,6 +176,8 @@ This repo is active work. Do not reset or discard changes.
 
 Vercel account/project work remains paused, but local tests/builds, report-viewer build, and control-plane hardening are committed or verified locally.
 
+The first Compose slice for `csp-audit` lives at `docker-compose.yml` and currently includes the report viewer and scan worker. The Hermes gateway now has its own optional profile in the same file, seeds its runtime credentials into `hermes-home/.env`, and emits csp-audit heartbeats.
+
 Latest local workflow proof, checked 2026-05-12:
 
 ```text
@@ -168,8 +190,16 @@ PASS  ffmpeg -version
 PASS  pnpm test
 PASS  pnpm --prefix report-viewer lint
 PASS  pnpm --prefix report-viewer exec vitest run
+PASS  pnpm --prefix report-viewer exec tsc --noEmit
 PASS  pnpm --prefix report-viewer build
+PASS  python3 -m py_compile hermes-agent/scripts/csp-audit-heartbeat.py hermes-agent/scripts/csp-audit-task-runner.py
+PASS  bash -n hermes-agent/scripts/gateway-bootstrap.sh
+PASS  docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway config --quiet
+PASS  docker compose ps shows csp-report-viewer, csp-scan-worker, and hermes-gateway running
 PASS  report-viewer local HTTP probe: HTTP/1.1 200 OK at http://127.0.0.1:3000
+PASS  csp-report-viewer and hermes-gateway images rebuilt after P4 bridge changes
+WARN  live /api/agent/heartbeat returns 500: Supabase request timeout from inside the report-viewer container
+WARN  receipt-mode task consumption remains blocked until Supabase connectivity/config is fixed
 WARN  ollama daemon not reachable
 FAIL  pnpm ops:validate due account/env prerequisites intentionally not configured
 ```
@@ -185,26 +215,27 @@ AGENT_TOKEN warning/state check
 
 Do not fix the Vercel-linked validation item until Vercel work is intentionally resumed. `SCAN_WORKER_TOKEN` is only needed when running a local scan worker or agent integration.
 
-Current local report-viewer dev server:
-
-```text
-URL: http://127.0.0.1:3000
-Command: pnpm --prefix report-viewer dev --hostname 127.0.0.1 --port 3000
-Primary process observed: 236570
-```
-
 ### `hermes-agent`
 
 Current status:
 
 ```text
-clean
+local Docker gateway integration files pending verification/commit
+```
+
+Current local P4 work:
+
+```text
+Dockerfile.gateway
+gateway-bootstrap.sh
+csp-audit-heartbeat.py
+csp-audit-task-runner.py
 ```
 
 Handling rule:
 
 ```text
-Treat this as an upstream clone. Keep workbench planning docs in the root meta-repo under docs/plans/.
+Treat this as an upstream clone for upstream contribution purposes. The Docker gateway files are local workbench integration work and should not be pushed upstream unless a separate contribution decision is made.
 ```
 
 ### `Ollama`
@@ -328,26 +359,26 @@ none from the current workbench doctor list
 
 Notes:
 
-- `vercel` is installed, but Vercel account/project actions are paused.
+- `vercel` is installed. A new Vercel account exists, but the csp-audit report-viewer project still needs to be linked/configured to the new account.
 - `ollama` is installed, but the local daemon was not reachable during the latest check.
 - `go` caches are configured under `/mnt/develop/build-cache/go` so module/build cache growth stays on the ext4 development partition.
 
 ## Vercel Status
 
-Vercel work is currently on hold.
+Vercel recovery is now active for the new account.
 
-Do not run:
+Current target:
 
-```bash
-vercel login
-vercel link
-vercel deploy
-vercel env pull
+```text
+Supabase remains the same
+Vercel project must be recreated or relinked under the new account
+GitHub Actions remains the production deploy controller
+REPORT_VIEWER_BASE_URL must be set as a GitHub Actions repository variable after first deploy
 ```
 
-until account ownership and project configuration are intentionally resolved.
+Do not enable duplicate Vercel Git production auto-deploys yet. Use GitHub Actions with `vercel pull`, `vercel build --prod`, and `vercel deploy --prebuilt --prod` first.
 
-The repo can continue local development without Vercel.
+The repo can continue local development while the new Vercel project is being configured.
 
 ## Safe Actions
 
@@ -381,7 +412,7 @@ do not delete child project .git folders
 do not reset dirty child repos
 do not commit Fabric changes blindly
 do not clean cc-switch Rust target unless space is needed
-do not perform Vercel login/deploy/link actions
+do not perform Vercel deploy actions until the new project is linked and secrets are configured
 do not move Docker root data onto /mnt/develop yet
 ```
 
@@ -389,10 +420,11 @@ do not move Docker root data onto /mnt/develop yet
 
 Recommended next sequence:
 
-1. Keep Vercel paused and continue local `csp-audit` development.
+1. Link/configure the new Vercel project for `csp-audit/report-viewer` without enabling duplicate production auto-deploys.
 2. Configure `SCAN_WORKER_TOKEN` only when starting local worker or Hermes task-claim integration.
-3. Use `docs/integrations/hermes-with-csp-audit.md` as the next implementation contract.
-4. Prove one local approved-task style workflow before adding deployment services.
-5. Start Ollama only when a local model task needs it.
-6. Keep upstream clones clean unless an explicit upstream contribution branch is opened.
+3. Enable `CSP_AUDIT_TASK_POLL_ENABLED=true` only when intentionally testing gateway task consumption.
+4. Use `docs/integrations/hermes-with-csp-audit.md` as the next implementation contract.
+5. Prove one local approved-task style workflow before adding deployment services.
+6. Start Ollama only when a local model task needs it.
+7. Keep upstream clones clean unless an explicit upstream contribution branch is opened.
 

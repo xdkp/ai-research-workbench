@@ -37,6 +37,7 @@ temp/
 .env
 .env.*
 !.env.example
+/docker-compose.env
 
 # OS/editor noise
 .DS_Store

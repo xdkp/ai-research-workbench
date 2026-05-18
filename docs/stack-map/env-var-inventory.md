@@ -35,6 +35,7 @@ Ollama hosts local model files and inference. It does not own security tasks, ev
 |---|---|---:|---|
 | `SUPABASE_URL` | csp-audit | yes for hosted DB | Server-side only |
 | `SUPABASE_SERVICE_ROLE_KEY` | csp-audit | yes for hosted DB | Never expose to browser |
+| `SUPABASE_REQUEST_TIMEOUT_MS` | csp-audit | optional | Server-side Supabase request timeout; default `8000` so agent routes fail cleanly instead of hanging |
 | `AGENT_TOKEN` | csp-audit agent routes | yes for agent API | Shared secret for Hermes/agent routes |
 | `VIEWER_BASIC_AUTH_USER` | report-viewer | recommended | Protects browser/API viewer |
 | `VIEWER_BASIC_AUTH_PASSWORD` | report-viewer | recommended | Must be paired with user |
@@ -43,12 +44,21 @@ Ollama hosts local model files and inference. It does not own security tasks, ev
 | `VERCEL_ORG_ID` | Vercel/GitHub Actions | only deploy/preview DAST | Account/team-specific |
 | `VERCEL_PROJECT_ID` | Vercel/GitHub Actions | only deploy/preview DAST | Project-specific |
 | `VERCEL_AUTOMATION_BYPASS_SECRET` | Vercel preview protection | only preview DAST | Do not confuse with project token |
+| `REPORT_VIEWER_BASE_URL` | GitHub Actions variable | production DAST/local worker | Set to the new Vercel production URL after first deploy |
 
 ## Hermes Gateway Bots
 
 | Variable | Owner | Required? | Notes |
 |---|---|---:|---|
 | Telegram/Discord/Slack/etc bot tokens | Hermes | only if gateway enabled | Rotate if bot account changes |
+| `HERMES_HOME` | Hermes | optional | Overrides the gateway runtime config root if you do not want the default `~/.hermes` |
+| `CSP_AUDIT_BASE_URL` | csp-audit | yes for agent heartbeat wiring | Used by Hermes gateway heartbeat bridge to reach `/api/agent/heartbeat` |
+| `CSP_AUDIT_AGENT_NAME` | Hermes | optional | Agent identity reported to csp-audit |
+| `CSP_AUDIT_AGENT_MODEL` | Hermes | optional | Model string reported to csp-audit |
+| `CSP_AUDIT_AGENT_PROFILE` | Hermes | optional | Profile string reported to csp-audit |
+| `CSP_AUDIT_TASK_POLL_ENABLED` | Hermes/csp-audit bridge | optional | Default `false`; set `true` only when the gateway should consume approved/not-required tasks |
+| `CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS` | Hermes/csp-audit bridge | optional | Poll delay for task claiming loop |
+| `CSP_AUDIT_TASK_EXECUTION_MODE` | Hermes/csp-audit bridge | optional | Current supported value is `receipt`; proves API plumbing without target testing |
 
 ## cc-switch Provider Profiles
 

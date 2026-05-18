@@ -5,6 +5,19 @@ This folder is the local operating workspace for an AI-assisted security researc
 
 The goal is not to merge all upstream projects into one codebase. The goal is to make them work together through one clear local workflow.
 
+## Current Implementation Phase
+
+The workspace docs and checks are already in place.
+
+- P1: complete, workspace front door and docs exist.
+- P2: complete, integration contracts exist.
+- P3: complete, read-only health checks exist and pass.
+- P4: in progress, optional Docker Compose services starting with the csp-audit report viewer and scan worker, plus a Hermes gateway profile that seeds credentials and heartbeats to csp-audit.
+
+Use `docs/operations/current-workspace-status.md` for the live status snapshot.
+
+The local container entry point is `docker-compose.yml`.
+
 ## What This Workspace Is For
 
 ```text

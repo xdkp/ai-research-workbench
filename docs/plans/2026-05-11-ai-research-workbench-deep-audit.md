@@ -450,42 +450,39 @@ Tier 2: fast tests/builds per active project
 Tier 3: optional integration checks requiring accounts/services
 ```
 
-## Priority Recommendations
+## Implementation Status
 
-### P0 - Stop Confusion And Data Loss Risk
+This plan has moved from recommendation to execution tracking.
 
-1. Fix or remove the empty workspace `.git` directory.
-2. Do not commit the Fabric 772-file mechanical diff.
-3. Document `cc-switch/src-tauri/target` as disposable cache.
-4. Keep upstream clone changes separate from local integration docs.
+| Phase | Status | Notes |
+|---|---|---|
+| P0 | mostly complete | The remaining item is operational hygiene, not a new feature path. |
+| P1 | complete | Workspace front door, maps, setup, and recovery docs exist. |
+| P2 | complete | Hermes, Fabric, cc-switch, and csp-audit boundaries are documented. |
+| P3 | complete | Read-only health checks and `doctor.sh` are present and passing. |
+| P4 | in progress | Optional Docker Compose for stable services has started with the csp-audit report viewer and scan worker group, plus a separate Hermes gateway profile. |
 
-### P1 - Create The Missing Workbench Front Door
-
-1. Create `/mnt/develop/AI_Research/START_HERE.md`.
-2. Create component map, command map, config ownership, env inventory.
-3. Create new-machine setup checklist.
-4. Create account recovery guide.
-
-### P2 - Define Integration Contracts
-
-1. Hermes with Fabric: pattern usage and skill wrapping.
-2. Hermes with cc-switch: provider/profile boundary.
-3. Hermes with csp-audit: task claim, approval, scope, evidence return, candidate finding handoff, and generated report material.
-4. Codex/Claude local config: what is local and what is shared.
-
-### P3 - Add Read-Only Workspace Health Checks
-
-1. `scripts/check-paths.sh`
-2. `scripts/check-tools.sh`
-3. `scripts/doctor.sh`
-4. `scripts/check-projects.sh`
+## Next Implementation Phase
 
 ### P4 - Containerize Only Stable Services
 
 1. Start with optional Docker Compose for csp-audit services.
-2. Add Hermes gateway only after config ownership is documented.
+2. Add Hermes gateway only after config ownership is documented. This is now represented as a separate Hermes-owned Compose profile.
 3. Add Ollama/model service only if model hosting is in active use.
 4. Do not introduce Kubernetes yet.
+
+## Remaining Hygiene Tasks
+
+These are still worth addressing, but they are not blocking the workspace docs or health checks:
+
+1. Fix or remove the empty workspace `.git` directory if it still causes confusion.
+2. Keep the Fabric mechanical diff out of commits.
+3. Keep `cc-switch/src-tauri/target` documented as disposable cache.
+4. Keep upstream clone changes separate from local integration docs.
+
+## P4 Starting Point
+
+The first Compose service group is the csp-audit report viewer plus scan worker. The remaining csp-audit services can be added once the base services are proven locally.
 
 ## Suggested 30-Day Roadmap
 

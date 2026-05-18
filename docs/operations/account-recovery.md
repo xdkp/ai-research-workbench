@@ -21,20 +21,36 @@ VERCEL_TOKEN
 VERCEL_ORG_ID
 VERCEL_PROJECT_ID
 VERCEL_AUTOMATION_BYPASS_SECRET, if preview DAST is used
+REPORT_VIEWER_BASE_URL as a GitHub Actions repository variable after first deploy
 ```
 
-Check:
+New-account setup checklist:
 
 ```text
-Vercel project root = csp-audit/report-viewer
-build command
-install command
-environment variables
-custom domains
-GitHub repo connection
+Create or link Vercel project under the new account
+Connect GitHub repo: xdkp/csp-audit
+Set project root directory: report-viewer
+Use Next.js framework defaults
+Set production branch: main
+Keep GitHub Actions as production deploy controller
+Disable Vercel Git production auto-deploys until intentionally enabled
 ```
 
-Do not change code just because the Vercel account changed unless project IDs or URLs are hardcoded in docs/config.
+Vercel environment variables to recreate:
+
+```text
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+SUPABASE_REQUEST_TIMEOUT_MS
+SCAN_WORKER_TOKEN
+AGENT_TOKEN
+VIEWER_BASIC_AUTH_USER
+VIEWER_BASIC_AUTH_PASSWORD
+VIEWER_SESSION_SECRET
+VERCEL_AUTOMATION_BYPASS_SECRET
+```
+
+Do not change application code just because the Vercel account changed. Only update hardcoded old URLs, account IDs, project IDs, and deployment docs/config.
 
 ## Supabase
 
@@ -75,7 +91,7 @@ SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY
 ```
 
-Only add secrets that the workflow actually needs.
+Only add secrets that the workflow actually needs. Add non-secret `REPORT_VIEWER_BASE_URL` as a repository variable, not a secret, unless you intentionally keep the hosted URL private.
 
 ## Model Provider
 
