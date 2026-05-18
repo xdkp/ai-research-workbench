@@ -143,7 +143,7 @@ Do not clean it automatically during normal workspace checks.
 Current status:
 
 ```text
-local P4 integration changes pending verification/commit
+clean (local P4 bridge changes and API hardening wrappers committed)
 ```
 
 Current local P4 work:
