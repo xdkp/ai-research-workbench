@@ -1,6 +1,6 @@
 # Current Workspace Status
 
-Date checked: 2026-05-12
+Date checked: 2026-05-18
 
 Workspace root:
 
@@ -25,10 +25,10 @@ P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and 
 
 The workspace root is now a valid Git repository.
 
-Current committed baseline before local workflow proof update:
+Current committed baseline:
 
 ```text
-46e7e1b Update workbench tool status
+a5eba24 docs: update workspace status for csp-audit completion
 ```
 
 Root remote:
@@ -143,29 +143,37 @@ Do not clean it automatically during normal workspace checks.
 Current status:
 
 ```text
-clean (local P4 bridge changes and API hardening wrappers committed)
+clean — develop and main synced at 4867f16
 ```
 
-Current local P4 work:
+Branch state:
 
 ```text
+develop: 4867f16 (pushed to origin)
+main: 2f9ffbd (pushed to origin, develop is 1 commit ahead with README update)
+```
+
+Recently completed work:
+
+```text
+server-side API hardening suite (security-headers, server-validation, api-rate-limit, secure-api-handler, secure-error-handler)
+auth/login, scans, worker/claim, reports/main routes hardened with secure wrappers
 claim_next_agent_task RPC contract fixed to use p_agent_name
 empty task queue now returns { task: null } consistently
 agent claim route tests and Supabase claim helper tests added
-Docker report-viewer image needs rebuild before running container uses these code changes
+control-plane hardening, task approval, scope validation, atomic scan claiming
+engagements, findings, submissions CRUD routes and dashboard tabs
+scope-utils with wildcard/exact/regex matching (19 test assertions)
+plan.md updated with accurate phase status markers
 ```
 
-Recently completed local work:
+Known remaining work:
 
 ```text
-control-plane hardening
-task approval behavior
-target and engagement scope validation
-atomic scan claiming RPC
-agent token misconfiguration handling
-route-level tests
-Preview DAST secret skipping behavior
-documentation updates
+24 of 38 API route files still use raw NextResponse (not hardened)
+2 fake security test files need rewriting (engagement-security, findings-security)
+PII detection on finding export needs test coverage
+Vercel project linking still pending for new account
 ```
 
 Handling rule:
@@ -173,8 +181,6 @@ Handling rule:
 ```text
 This repo is active work. Do not reset or discard changes.
 ```
-
-Vercel account/project work remains paused, but local tests/builds, report-viewer build, and control-plane hardening are committed or verified locally.
 
 The first Compose slice for `csp-audit` lives at `docker-compose.yml` and currently includes the report viewer and scan worker. The Hermes gateway now has its own optional profile in the same file, seeds its runtime credentials into `hermes-home/.env`, and emits csp-audit heartbeats.
 
