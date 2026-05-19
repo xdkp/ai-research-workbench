@@ -46,6 +46,13 @@ csp-audit scope and task approval
 
 ## Verification
 
+Use the repeatable smoke check:
+
+```bash
+cd /mnt/develop/AI_Research
+./scripts/prove-hermes-security-skills.sh
+```
+
 After changing this mount, verify Compose syntax:
 
 ```bash
@@ -74,6 +81,7 @@ PASS docker compose config --quiet
 PASS docker compose --env-file docker-compose.env --profile hermes-gateway up -d --force-recreate hermes-gateway
 PASS docker compose exec hermes-gateway find /data/hermes/skills/security/workbench -maxdepth 3 -name SKILL.md -print
 PASS /data/hermes/skills/security/workbench/scope-guard-preflight/SKILL.md is readable inside hermes-gateway
+PASS hermes skills list --source local --enabled-only reports 5 local enabled security skills
 ```
 
 Mounted skill files observed inside the container:

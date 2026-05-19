@@ -230,6 +230,7 @@ PASS  bash -n hermes-agent/scripts/gateway-bootstrap.sh
 PASS  docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway config --quiet
 PASS  docker compose ps shows csp-report-viewer, csp-scan-worker, and hermes-gateway running
 PASS  Hermes gateway can read five mounted security skill specs from /data/hermes/skills/security/workbench
+PASS  ./scripts/prove-hermes-security-skills.sh validates Hermes lists all five as local enabled skills
 PASS  report-viewer local HTTP probe: HTTP/1.1 200 OK at http://127.0.0.1:3000
 PASS  csp-report-viewer and hermes-gateway images rebuilt after P4 bridge changes
 PASS  live /api/agent/heartbeat succeeds from hermes-gateway
