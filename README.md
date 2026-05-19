@@ -95,3 +95,4 @@ Historical workbench planning records are archived here:
 ```text
 docs/plans/README.md
 ```
+/home/m0bious/.gemini/antigravity/brain/26ffa302-f50d-4d44-8361-220adfa34351/

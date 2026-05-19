@@ -19,6 +19,11 @@ services:
       VIEWER_BASIC_AUTH_USER: ${VIEWER_BASIC_AUTH_USER:-}
       VIEWER_BASIC_AUTH_PASSWORD: ${VIEWER_BASIC_AUTH_PASSWORD:-}
       VIEWER_SESSION_SECRET: ${VIEWER_SESSION_SECRET:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    volumes:
+      - ./scripts:/scripts:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     init: true
     healthcheck:
@@ -27,9 +32,6 @@ services:
       timeout: 5s
       retries: 12
       start_period: 20s
-    profiles:
-      - csp-audit
-      - hermes-gateway
 
   csp-scan-worker:
     build:
@@ -48,8 +50,6 @@ services:
       SCAN_WORKER_IDLE_SECONDS: ${SCAN_WORKER_IDLE_SECONDS:-30}
     restart: unless-stopped
     init: true
-    profiles:
-      - csp-audit
 
   hermes-gateway:
     build:
@@ -69,12 +69,14 @@ services:
       CSP_AUDIT_HEARTBEAT_INTERVAL_SECONDS: ${CSP_AUDIT_HEARTBEAT_INTERVAL_SECONDS:-30}
       CSP_AUDIT_TASK_POLL_ENABLED: ${CSP_AUDIT_TASK_POLL_ENABLED:-false}
       CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS: ${CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS:-60}
-      CSP_AUDIT_TASK_EXECUTION_MODE: ${CSP_AUDIT_TASK_EXECUTION_MODE:-receipt}
+      CSP_AUDIT_TASK_EXECUTION_MODE: ${CSP_AUDIT_TASK_EXECUTION_MODE:-analysis}
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      FABRIC_API_URL: ${FABRIC_API_URL:-http://host.docker.internal:11434}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
-      OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
       SLACK_BOT_TOKEN: ${SLACK_BOT_TOKEN:-}
       WHATSAPP_BOT_TOKEN: ${WHATSAPP_BOT_TOKEN:-}
       SIGNAL_BOT_TOKEN: ${SIGNAL_BOT_TOKEN:-}
@@ -84,10 +86,10 @@ services:
       WEBHOOK_TOKEN: ${WEBHOOK_TOKEN:-}
     volumes:
       - hermes-home:/data/hermes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     init: true
-    profiles:
-      - hermes-gateway
 
 volumes:
   hermes-home:
