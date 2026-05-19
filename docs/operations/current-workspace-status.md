@@ -18,7 +18,7 @@ Current implementation status:
 P1 complete: workspace front door and docs exist
 P2 complete: integration contracts exist
 P3 complete: read-only health checks exist and pass
-P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and Hermes gateway; heartbeat and receipt-mode task bridge are live and proved locally; first low-risk Hermes security skill specs extracted from pentest-ai-agents methodology
+P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and Hermes gateway; heartbeat and receipt-mode task bridge are live and proved locally; first low-risk Hermes security skill specs extracted from pentest-ai-agents methodology and mounted read-only into Hermes gateway by Docker Compose
 ```
 
 ## Workspace Meta-Repo
@@ -108,6 +108,12 @@ Local Hermes security skill specs:
 
 ```text
 docs/skills/hermes-security/README.md
+```
+
+Runtime mount documentation:
+
+```text
+docs/operations/hermes-security-skills-runtime.md
 ```
 
 ## Current Child Repo State
@@ -223,6 +229,7 @@ PASS  python3 -m py_compile hermes-agent/scripts/csp-audit-heartbeat.py hermes-a
 PASS  bash -n hermes-agent/scripts/gateway-bootstrap.sh
 PASS  docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway config --quiet
 PASS  docker compose ps shows csp-report-viewer, csp-scan-worker, and hermes-gateway running
+PASS  Hermes gateway can read five mounted security skill specs from /data/hermes/skills/security/workbench
 PASS  report-viewer local HTTP probe: HTTP/1.1 200 OK at http://127.0.0.1:3000
 PASS  csp-report-viewer and hermes-gateway images rebuilt after P4 bridge changes
 PASS  live /api/agent/heartbeat succeeds from hermes-gateway

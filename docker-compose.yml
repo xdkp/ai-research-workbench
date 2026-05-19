@@ -86,6 +86,7 @@ services:
       WEBHOOK_TOKEN: ${WEBHOOK_TOKEN:-}
     volumes:
       - hermes-home:/data/hermes
+      - ./docs/skills/hermes-security:/data/hermes/skills/security/workbench:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
