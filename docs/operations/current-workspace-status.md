@@ -80,7 +80,7 @@ scope
 -> report export
 ```
 
-`csp-audit` is the system of record for this workflow. Hermes, Fabric, cc-switch, Ollama, Codex, and Claude Code are support tools around that control plane.
+`csp-audit` is the system of record for this workflow. Hermes, Fabric, cc-switch, Ollama, Codex, Claude Code, and extracted `pentest-ai-agents` methodology are support tools around that control plane.
 
 ## Child Project Roles
 
@@ -92,6 +92,17 @@ scope
 | `cc-switch` | Claude Code / Codex style switching and local helper tooling | Clean child repo, has large Rust build cache |
 | `Ollama` | Local model runtime and model storage | Client installed; daemon was not running when checked |
 | `oh-my-claudecode` | Claude Code configuration/plugin reference | Clean child repo |
+| `pentest-ai-agents` | External methodology and Claude-agent prompt reference for Hermes security skills | Reference-only; do not vendor contents or stage pointer/internal changes casually |
+
+## Methodology Reference State
+
+`pentest-ai-agents` is present as a local reference source for security methodology extraction. It is not an implementation target for the root meta-repo and should not be committed wholesale. If represented by a gitlink, only the pointer is tracked; internal source changes stay in that repo. The approved use is to extract scope-guard language, role methodology, reporting structure, and low-risk advisory workflows into Hermes-compatible skills while keeping task approval, evidence, findings, and reports in `csp-audit`.
+
+Extraction map:
+
+```text
+docs/integrations/pentest-ai-agents-methodology-extraction.md
+```
 
 ## Current Child Repo State
 
