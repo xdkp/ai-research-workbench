@@ -40,7 +40,7 @@ hermes-gateway container
 | Task claiming | Implemented, opt-in, proved | Disabled unless `CSP_AUDIT_TASK_POLL_ENABLED=true` |
 | Event posting | Implemented, opt-in, proved | Runner posts `started`, `checkpoint`, and `completed` events |
 | Result submission | Implemented, opt-in, proved | Runner submits a markdown receipt report |
-| Receipt proof | Proved 2026-05-19 | Task `6d409002-89ea-490e-8135-a69302f4410e` completed with four persisted events and one generated report |
+| Receipt proof | Proved 2026-05-19 | Tasks `6d409002-89ea-490e-8135-a69302f4410e` and `8870f2ae-7b1c-464a-9100-b3a538ed6d84` completed with four persisted events and generated reports |
 | Real security execution | Not proved | Receipt mode performs no target interaction, scanning, or exploitation |
 
 ## Required Environment
@@ -90,25 +90,15 @@ If the report-viewer code changed, rebuild the affected services first:
 docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway up -d --build csp-report-viewer hermes-gateway
 ```
 
-## Create A Local Test Task
+## Run The Receipt Smoke Check
 
 Use a harmless public documentation target for the bridge proof. Do not use this receipt runner for real testing evidence.
 
 ```bash
-curl -X POST http://localhost:3000/api/tasks \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Local Hermes gateway bridge proof",
-    "instructions": "Prove the local gateway can claim a task, post events, submit a generated report, and update task status. Do not perform external testing.",
-    "target_url": "https://example.com",
-    "target_type": "webapp",
-    "risk_level": "low",
-    "allowed_actions": "claim,event,report,status",
-    "requires_approval": false
-  }'
+./scripts/prove-hermes-receipt-loop.sh
 ```
 
-The task will be claimable because `requires_approval=false` creates `approval_status=not_required`.
+The script creates a claimable task with `requires_approval=false`, restarts `hermes-gateway` so it polls immediately, and verifies task status, events, and generated report persistence.
 
 ## Verify
 

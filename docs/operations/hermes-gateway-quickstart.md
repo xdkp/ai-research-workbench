@@ -88,36 +88,23 @@ Restart the gateway:
 docker compose --env-file docker-compose.env --profile hermes-gateway restart hermes-gateway
 ```
 
-## 5. Create A Safe Test Task
+## 5. Prove Receipt Mode
+
+Run the repeatable smoke check:
 
 ```bash
-curl -X POST http://localhost:3000/api/tasks \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Local Hermes gateway bridge proof",
-    "instructions": "Prove the local gateway can claim a task, post events, submit a generated report, and update task status. Do not perform external testing.",
-    "target_url": "https://example.com",
-    "target_type": "webapp",
-    "risk_level": "low",
-    "allowed_actions": "claim,event,report,status",
-    "requires_approval": false
-  }'
+./scripts/prove-hermes-receipt-loop.sh
 ```
 
-Watch the gateway:
-
-```bash
-docker compose --env-file docker-compose.env --profile hermes-gateway logs --tail=100 hermes-gateway
-```
-
-Expected result in csp-audit:
+The script creates a harmless receipt-mode task, restarts the gateway so it polls immediately, and verifies:
 
 ```text
-task claimed
-task events created
-generated receipt report created
-task marked completed
+task completed
+events persisted: claimed, started, checkpoint, completed
+generated receipt report persisted
 ```
+
+It reads credentials from the running containers and does not print secret values.
 
 ## Stop
 

@@ -211,6 +211,7 @@ PASS  csp-report-viewer and hermes-gateway images rebuilt after P4 bridge change
 PASS  live /api/agent/heartbeat succeeds from hermes-gateway
 PASS  receipt-mode task consumption succeeds: claimed -> started -> checkpoint -> completed
 PASS  generated receipt report persisted for task 6d409002-89ea-490e-8135-a69302f4410e
+PASS  ./scripts/prove-hermes-receipt-loop.sh reran proof successfully with task 8870f2ae-7b1c-464a-9100-b3a538ed6d84
 WARN  ollama daemon not required for receipt proof
 FAIL  pnpm ops:validate due account/env prerequisites intentionally not configured
 ```
@@ -432,7 +433,7 @@ do not move Docker root data onto /mnt/develop yet
 Recommended next sequence:
 
 1. Build the scoped Hermes analysis/recon adapter behind the existing `CSP_AUDIT_TASK_EXECUTION_MODE` switch; keep `receipt` as the safe default.
-2. Add a repeatable receipt-loop smoke script so the local proof can be rerun without hand-built API calls.
+2. Use `./scripts/prove-hermes-receipt-loop.sh` before changing the Hermes bridge or report-viewer Agent API.
 3. Keep `CSP_AUDIT_TASK_POLL_ENABLED=true` only when intentionally testing gateway task consumption.
 4. Use `docs/integrations/hermes-with-csp-audit.md` as the next implementation contract.
 5. Link/configure the new Vercel project for `csp-audit/report-viewer` only when deployment work resumes.
