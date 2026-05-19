@@ -1,6 +1,6 @@
 # Hermes Gateway API Integration with csp-audit
 
-This guide documents the local Docker Compose bridge between `hermes-agent` and `csp-audit`. The goal is to prove the control-plane path before adding real execution adapters.
+This guide documents the local Docker Compose bridge between `hermes-agent` and `csp-audit`. Receipt mode now proves the control-plane path before adding real execution adapters.
 
 ## Ownership Boundary
 
@@ -37,10 +37,11 @@ hermes-gateway container
 | --- | --- | --- |
 | Credential seeding | Implemented | `docker-compose.env` is copied into `/data/hermes/.env` for selected runtime keys |
 | Heartbeat | Implemented | Runs by default when `CSP_AUDIT_BASE_URL` and `AGENT_TOKEN` exist |
-| Task claiming | Implemented, opt-in | Disabled unless `CSP_AUDIT_TASK_POLL_ENABLED=true` |
-| Event posting | Implemented, opt-in | Runner posts `started`, `checkpoint`, and `completed` events |
-| Result submission | Implemented, opt-in | Runner submits a markdown receipt report |
-| Real security execution | Not implemented | Receipt mode performs no target interaction, scanning, or exploitation |
+| Task claiming | Implemented, opt-in, proved | Disabled unless `CSP_AUDIT_TASK_POLL_ENABLED=true` |
+| Event posting | Implemented, opt-in, proved | Runner posts `started`, `checkpoint`, and `completed` events |
+| Result submission | Implemented, opt-in, proved | Runner submits a markdown receipt report |
+| Receipt proof | Proved 2026-05-19 | Task `6d409002-89ea-490e-8135-a69302f4410e` completed with four persisted events and one generated report |
+| Real security execution | Not proved | Receipt mode performs no target interaction, scanning, or exploitation |
 
 ## Required Environment
 
@@ -162,7 +163,7 @@ Only queued tasks with `approval_status` of `not_required` or `approved` can be 
 
 ## Next Implementation Step
 
-Replace receipt mode with a scoped Hermes execution adapter that:
+Keep receipt mode as the safe default and add a scoped Hermes execution adapter that:
 
 1. Reads the csp-audit task instructions and allowed actions.
 2. Loads approved Fabric patterns if needed.
