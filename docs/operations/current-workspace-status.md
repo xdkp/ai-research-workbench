@@ -18,7 +18,7 @@ Current implementation status:
 P1 complete: workspace front door and docs exist
 P2 complete: integration contracts exist
 P3 complete: read-only health checks exist and pass
-P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and Hermes gateway; heartbeat and receipt-mode task bridge are live and proved locally
+P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and Hermes gateway; heartbeat and receipt-mode task bridge are live and proved locally; first low-risk Hermes security skill specs extracted from pentest-ai-agents methodology
 ```
 
 ## Workspace Meta-Repo
@@ -102,6 +102,12 @@ Extraction map:
 
 ```text
 docs/integrations/pentest-ai-agents-methodology-extraction.md
+```
+
+Local Hermes security skill specs:
+
+```text
+docs/skills/hermes-security/README.md
 ```
 
 ## Current Child Repo State
