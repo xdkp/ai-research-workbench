@@ -26,7 +26,6 @@ jobs:
   dispatch:
     needs: package
     runs-on: ubuntu-latest
-    if: env.REPO_MGMT_PAT != ''
     env:
       REPO_MGMT_PAT: ${{ secrets.REPO_MGMT_PAT }}
       TARGET_REPOS: |
@@ -36,6 +35,7 @@ jobs:
         xdkp/ai-research-workbench
     steps:
       - name: Notify target repos
+        if: env.REPO_MGMT_PAT != ''
         run: |
           set -e
           for r in $TARGET_REPOS; do
