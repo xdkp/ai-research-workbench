@@ -44,5 +44,5 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: token $REPO_MGMT_PAT" \
               https://api.github.com/repos/$r/dispatches \
-              -d '{"event_type":"update-hook-template"}'
+              -d '{"event_type":"update-hook-template","client_payload":{"ref":"${{ github.sha }}","repository":"${{ github.repository }}"}}'
           done
