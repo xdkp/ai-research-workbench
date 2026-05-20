@@ -1,6 +1,6 @@
 # Current Workspace Status
 
-Date checked: 2026-05-18
+Date checked: 2026-05-19
 
 Workspace root:
 
@@ -18,18 +18,20 @@ Current implementation status:
 P1 complete: workspace front door and docs exist
 P2 complete: integration contracts exist
 P3 complete: read-only health checks exist and pass
-P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and Hermes gateway; heartbeat/task bridge processes are wired, but live agent API calls currently return 500 because the report viewer cannot reach Supabase before timeout
+P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and Hermes gateway; heartbeat and receipt-mode task bridge are live and proved locally; first low-risk Hermes security skill specs extracted from pentest-ai-agents methodology and mounted read-only into Hermes gateway by Docker Compose
 ```
 
 ## Workspace Meta-Repo
 
 The workspace root is now a valid Git repository.
 
-Current committed baseline:
+Current branch:
 
 ```text
-a5eba24 docs: update workspace status for csp-audit completion
+develop tracking origin/develop
 ```
+
+Use `git log -1 --oneline` at the workspace root for the exact current baseline.
 
 Root remote:
 
@@ -78,18 +80,41 @@ scope
 -> report export
 ```
 
-`csp-audit` is the system of record for this workflow. Hermes, Fabric, cc-switch, Ollama, Codex, and Claude Code are support tools around that control plane.
+`csp-audit` is the system of record for this workflow. Hermes, Fabric, cc-switch, Ollama, Codex, Claude Code, and extracted `pentest-ai-agents` methodology are support tools around that control plane.
 
 ## Child Project Roles
 
 | Project | Role | Ownership status |
 | --- | --- | --- |
-| `csp-audit` | Security control plane, scans, findings, approvals, report viewer, DAST gate | Active local development; local P4 bridge changes pending verification/commit |
+| `csp-audit` | Security control plane, scans, findings, approvals, report viewer, DAST gate | Active local development; local Hermes receipt bridge proved on feature branch |
 | `hermes-agent` | Agent runtime, orchestration, skills, gateway, CLI/TUI/web surfaces | Upstream clone plus local Docker gateway integration files; do not push upstream casually |
 | `Fabric` | Prompt/pattern library and analysis patterns | Upstream clone, keep clean |
 | `cc-switch` | Claude Code / Codex style switching and local helper tooling | Clean child repo, has large Rust build cache |
 | `Ollama` | Local model runtime and model storage | Client installed; daemon was not running when checked |
 | `oh-my-claudecode` | Claude Code configuration/plugin reference | Clean child repo |
+| `pentest-ai-agents` | External methodology and Claude-agent prompt reference for Hermes security skills | Reference-only; do not vendor contents or stage pointer/internal changes casually |
+
+## Methodology Reference State
+
+`pentest-ai-agents` is present as a local reference source for security methodology extraction. It is not an implementation target for the root meta-repo and should not be committed wholesale. If represented by a gitlink, only the pointer is tracked; internal source changes stay in that repo. The approved use is to extract scope-guard language, role methodology, reporting structure, and low-risk advisory workflows into Hermes-compatible skills while keeping task approval, evidence, findings, and reports in `csp-audit`.
+
+Extraction map:
+
+```text
+docs/integrations/pentest-ai-agents-methodology-extraction.md
+```
+
+Local Hermes security skill specs:
+
+```text
+docs/skills/hermes-security/README.md
+```
+
+Runtime mount documentation:
+
+```text
+docs/operations/hermes-security-skills-runtime.md
+```
 
 ## Current Child Repo State
 
@@ -143,14 +168,14 @@ Do not clean it automatically during normal workspace checks.
 Current status:
 
 ```text
-clean — develop and main synced at 4867f16
+clean — feature/phase5-model-router-extend pushed at 903ab95
 ```
 
 Branch state:
 
 ```text
-develop: 4867f16 (pushed to origin)
-main: 2f9ffbd (pushed to origin, develop is 1 commit ahead with README update)
+feature/phase5-model-router-extend: 903ab95 (pushed to origin)
+develop/main: managed by csp-audit branch workflow outside this local receipt proof
 ```
 
 Recently completed work:
@@ -160,7 +185,9 @@ server-side API hardening suite (security-headers, server-validation, api-rate-l
 auth/login, scans, worker/claim, reports/main routes hardened with secure wrappers
 claim_next_agent_task RPC contract fixed to use p_agent_name
 empty task queue now returns { task: null } consistently
+agent claim helper handles Supabase null-record responses without false claims
 agent claim route tests and Supabase claim helper tests added
+Hermes receipt-mode bridge proved: task 6d409002-89ea-490e-8135-a69302f4410e claimed, completed, four events persisted, one generated receipt report created
 control-plane hardening, task approval, scope validation, atomic scan claiming
 engagements, findings, submissions CRUD routes and dashboard tabs
 scope-utils with wildcard/exact/regex matching (19 test assertions)
@@ -184,7 +211,7 @@ This repo is active work. Do not reset or discard changes.
 
 The first Compose slice for `csp-audit` lives at `docker-compose.yml` and currently includes the report viewer and scan worker. The Hermes gateway now has its own optional profile in the same file, seeds its runtime credentials into `hermes-home/.env`, and emits csp-audit heartbeats.
 
-Latest local workflow proof, checked 2026-05-12:
+Latest local workflow proof, checked 2026-05-19:
 
 ```text
 PASS  ./scripts/doctor.sh
@@ -202,11 +229,15 @@ PASS  python3 -m py_compile hermes-agent/scripts/csp-audit-heartbeat.py hermes-a
 PASS  bash -n hermes-agent/scripts/gateway-bootstrap.sh
 PASS  docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway config --quiet
 PASS  docker compose ps shows csp-report-viewer, csp-scan-worker, and hermes-gateway running
+PASS  Hermes gateway can read five mounted security skill specs from /data/hermes/skills/security/workbench
+PASS  ./scripts/prove-hermes-security-skills.sh validates Hermes lists all five as local enabled skills
 PASS  report-viewer local HTTP probe: HTTP/1.1 200 OK at http://127.0.0.1:3000
 PASS  csp-report-viewer and hermes-gateway images rebuilt after P4 bridge changes
-WARN  live /api/agent/heartbeat returns 500: Supabase request timeout from inside the report-viewer container
-WARN  receipt-mode task consumption remains blocked until Supabase connectivity/config is fixed
-WARN  ollama daemon not reachable
+PASS  live /api/agent/heartbeat succeeds from hermes-gateway
+PASS  receipt-mode task consumption succeeds: claimed -> started -> checkpoint -> completed
+PASS  generated receipt report persisted for task 6d409002-89ea-490e-8135-a69302f4410e
+PASS  ./scripts/prove-hermes-receipt-loop.sh reran proof successfully with task 8870f2ae-7b1c-464a-9100-b3a538ed6d84
+WARN  ollama daemon not required for receipt proof
 FAIL  pnpm ops:validate due account/env prerequisites intentionally not configured
 ```
 
@@ -226,7 +257,7 @@ Do not fix the Vercel-linked validation item until Vercel work is intentionally 
 Current status:
 
 ```text
-local Docker gateway integration files pending verification/commit
+local Docker gateway integration is wired and receipt-mode bridge is proved
 ```
 
 Current local P4 work:
@@ -426,11 +457,11 @@ do not move Docker root data onto /mnt/develop yet
 
 Recommended next sequence:
 
-1. Link/configure the new Vercel project for `csp-audit/report-viewer` without enabling duplicate production auto-deploys.
-2. Configure `SCAN_WORKER_TOKEN` only when starting local worker or Hermes task-claim integration.
-3. Enable `CSP_AUDIT_TASK_POLL_ENABLED=true` only when intentionally testing gateway task consumption.
+1. Build the scoped Hermes analysis/recon adapter behind the existing `CSP_AUDIT_TASK_EXECUTION_MODE` switch; keep `receipt` as the safe default.
+2. Use `./scripts/prove-hermes-receipt-loop.sh` before changing the Hermes bridge or report-viewer Agent API.
+3. Keep `CSP_AUDIT_TASK_POLL_ENABLED=true` only when intentionally testing gateway task consumption.
 4. Use `docs/integrations/hermes-with-csp-audit.md` as the next implementation contract.
-5. Prove one local approved-task style workflow before adding deployment services.
+5. Link/configure the new Vercel project for `csp-audit/report-viewer` only when deployment work resumes.
 6. Start Ollama only when a local model task needs it.
 7. Keep upstream clones clean unless an explicit upstream contribution branch is opened.
 
