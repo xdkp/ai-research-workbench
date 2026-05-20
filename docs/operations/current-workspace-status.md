@@ -168,13 +168,13 @@ Do not clean it automatically during normal workspace checks.
 Current status:
 
 ```text
-clean — feature/phase5-model-router-extend pushed at 903ab95
+active local changes — feature/fix/harden-stats-plan at 0c39810 with uncommitted hardening/workflow changes
 ```
 
 Branch state:
 
 ```text
-feature/phase5-model-router-extend: 903ab95 (pushed to origin)
+feature/fix/harden-stats-plan: 0c39810 plus local uncommitted changes
 develop/main: managed by csp-audit branch workflow outside this local receipt proof
 ```
 
@@ -183,6 +183,16 @@ Recently completed work:
 ```text
 server-side API hardening suite (security-headers, server-validation, api-rate-limit, secure-api-handler, secure-error-handler)
 auth/login, scans, worker/claim, reports/main routes hardened with secure wrappers
+setup/save hardened against env-line injection and wrapped in secure POST handling
+setup/hardware switched to execFile-based detection and wrapped in secure GET handling
+worker/scans/[id] wrapped in secure PATCH handling with rate limiting
+agent heartbeat, claim, event, task update, and generated-report write routes wrapped with secure handlers and covered by agent-security tests
+reports/generated, reports/generate, and reports/pentest wrapped with secure handlers and covered by reports-security tests
+all report-viewer app/api route exports now use secure handlers; raw async route handler scan is clean
+agent scope context route added at /api/agent/engagements/[id]/scope for AGENT_TOKEN-authenticated scoped execution
+first scoped passive Hermes adapter added at scripts/hermes-scoped-adapter.js; it blocks active actions, validates scope, emits events, and publishes JSON draft evidence reports
+operator-reviewed generated report promotion added at /api/findings/import-from-report, with Reports tab action for JSON draft_finding reports
+foundation schema merged into canonical supabase/schema.sql: schema_version, audit_log, approval_policies, agent task approval columns, and finding fingerprint trigger/index; model_configs remains canonical model registry
 claim_next_agent_task RPC contract fixed to use p_agent_name
 empty task queue now returns { task: null } consistently
 agent claim helper handles Supabase null-record responses without false claims
@@ -192,14 +202,14 @@ control-plane hardening, task approval, scope validation, atomic scan claiming
 engagements, findings, submissions CRUD routes and dashboard tabs
 scope-utils with wildcard/exact/regex matching (19 test assertions)
 plan.md updated with accurate phase status markers
+setup/save, setup/hardware, and worker scan update route tests added
 ```
 
 Known remaining work:
 
 ```text
-24 of 38 API route files still use raw NextResponse (not hardened)
-2 fake security test files need rewriting (engagement-security, findings-security)
-PII detection on finding export needs test coverage
+Server-side API hardening route-wrapper phase is complete locally; keep future API routes on secure handlers
+Hermes scoped adapter work continues: expand beyond passive metadata reports into scoped recon/analysis adapters
 Vercel project linking still pending for new account
 ```
 
@@ -464,4 +474,3 @@ Recommended next sequence:
 5. Link/configure the new Vercel project for `csp-audit/report-viewer` only when deployment work resumes.
 6. Start Ollama only when a local model task needs it.
 7. Keep upstream clones clean unless an explicit upstream contribution branch is opened.
-
