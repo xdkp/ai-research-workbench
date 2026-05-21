@@ -86,9 +86,11 @@ services:
       MATTERMOST_BOT_TOKEN: ${MATTERMOST_BOT_TOKEN:-}
       EMAIL_BOT_TOKEN: ${EMAIL_BOT_TOKEN:-}
       WEBHOOK_TOKEN: ${WEBHOOK_TOKEN:-}
+      UQLM_MODEL: ${UQLM_MODEL:-qwen2.5:32b}
     volumes:
       - hermes-home:/data/hermes
       - ./docs/skills/hermes-security:/data/hermes/skills/security/workbench:ro
+      - ./uqlm:/workspace/uqlm:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
