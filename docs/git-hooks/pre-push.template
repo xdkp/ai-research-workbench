@@ -1,0 +1,13 @@
+#!/bin/sh
+# Canonical pre-push hook to allow pushes only to approved remotes
+REMOTE_NAME="$1"
+REMOTE_URL="$2"
+case "$REMOTE_URL" in
+  *ai_research*|*xdkp*|*github.com/xdkp* )
+    exit 0
+    ;;
+  *)
+    echo "Push blocked: remote is not allowed by local policy. Allowed: ai_research, xdkp" >&2
+    exit 1
+    ;;
+esac

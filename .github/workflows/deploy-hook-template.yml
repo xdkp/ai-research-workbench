@@ -1,0 +1,48 @@
+name: Deploy Hook Template
+
+on:
+  push:
+    branches: [ develop, master ]
+  workflow_dispatch: {}
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.upload.outputs.artifact }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create hook archive
+        run: |
+          mkdir -p out
+          tar -czf out/hook-template.tar.gz docs/git-hooks/pre-push.template scripts/install-hooks.sh
+      - name: Upload artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: hook-template
+          path: out/hook-template.tar.gz
+
+  dispatch:
+    needs: package
+    runs-on: ubuntu-latest
+    env:
+      REPO_MGMT_PAT: ${{ secrets.REPO_MGMT_PAT }}
+      TARGET_REPOS: |
+        xdkp/csp-audit
+        xdkp/hermes-agent
+        xdkp/cc-switch-custom
+        xdkp/ai-research-workbench
+    steps:
+      - name: Notify target repos
+        if: env.REPO_MGMT_PAT != ''
+        run: |
+          set -e
+          for r in $TARGET_REPOS; do
+            echo "Dispatching update-hook-template to $r"
+            curl -sS -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: token $REPO_MGMT_PAT" \
+              https://api.github.com/repos/$r/dispatches \
+              -d '{"event_type":"update-hook-template","client_payload":{"ref":"${{ github.sha }}","repository":"${{ github.repository }}"}}'
+          done
