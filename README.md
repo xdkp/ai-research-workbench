@@ -37,3 +37,21 @@ docker compose up        # boots portal, Hermes, scanner
 ./scripts/check-repos.sh     # status of all child repos
 ./scripts/doctor.sh          # full workspace health summary
 ```
+  Recalled 2 memories, wrote 3 memories (ctrl+o to expand)
+
+● Memory saved. Here's what a new session will pick up:
+
+  Where we are:
+  - Release A: 9/10 done — only operator triage UI remains
+  - CI: Mostly green — csp-audit Preview DAST Gate is the last failing check
+
+  The CI failure: Vercel SSO Protection blocks the preview URL with 401. The
+  VERCEL_AUTOMATION_BYPASS_SECRET secret is stale (from old csp-audit project). Fix options:
+  1. Get the correct bypass secret from Vercel dashboard → m0bious-projects/report-viewer → Settings →
+  Deployment Protection → Protection Bypass for Automation 
+  2. Or disable SSO Protection on the project
+
+  Key references saved:
+  - memory/reference/vercel-setup.md — all Vercel project IDs, tokens, org config
+  - memory/current-work.md — full Release A status, branch state, CI status
+  - memory/feedback/ — push to xdkp, verify before push, check CI after push
