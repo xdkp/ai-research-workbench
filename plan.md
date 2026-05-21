@@ -800,10 +800,12 @@ Detailed phase tracking: `csp-audit/plan.md` (Phase 0–12)
 - [x] Hallucination gate Layer 1
 - [x] Vuln intel Fabric pattern (`enrich_vuln_intel`)
 - [x] Hermes vuln intel adapter (NVD, KEV, EPSS, OSV, retry, circuit breaker, Playwright fallback)
-- [ ] cc-switch ↔ Hermes + Fabric runtime wiring
-- [ ] Operator triage with quarantine gates
 - [x] SQLite schema extended (vuln intel cache + sync_queue + checkpoint)
-- [ ] Crash checkpoints + offline buffer worker
+- [x] Crash checkpoints + offline buffer worker (sync_worker.py + task runner checkpoint logic)
+- [x] cc-switch ↔ Hermes + Fabric runtime wiring (Dockerfile, Fabric patterns, report mode, task polling)
+- [x] Portal cleaned to read-only dashboard (setup wizard removed, model config moved to cc-switch)
+- [ ] Operator triage with quarantine gates
+- [ ] cc-switch → Supabase model sync (model configs, selections, usage)
 
 ### Release B — UQLM Integration
 - [ ] `uqlm_verify.py` adapter module
@@ -815,7 +817,7 @@ Detailed phase tracking: `csp-audit/plan.md` (Phase 0–12)
 ### Release C — Advanced Automation
 - [ ] Dynamic model routing with cc-switch
 - [ ] Skill manager UI
-- [ ] Full observability dashboard
+- [ ] Full observability dashboard (Portal reads model usage/cost from Supabase)
 - [ ] Tuned UQLM ensemble with ground-truth calibration
 - [ ] Vuln intel data source caching + local mirror
 
