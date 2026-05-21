@@ -2,7 +2,7 @@ name: Deploy Hook Template
 
 on:
   push:
-    branches: [ develop, main ]
+    branches: [ develop, master ]
   workflow_dispatch: {}
 
 jobs:
@@ -26,7 +26,6 @@ jobs:
   dispatch:
     needs: package
     runs-on: ubuntu-latest
-    if: env.REPO_MGMT_PAT != ''
     env:
       REPO_MGMT_PAT: ${{ secrets.REPO_MGMT_PAT }}
       TARGET_REPOS: |
@@ -36,6 +35,7 @@ jobs:
         xdkp/ai-research-workbench
     steps:
       - name: Notify target repos
+        if: env.REPO_MGMT_PAT != ''
         run: |
           set -e
           for r in $TARGET_REPOS; do
@@ -44,5 +44,5 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: token $REPO_MGMT_PAT" \
               https://api.github.com/repos/$r/dispatches \
-              -d '{"event_type":"update-hook-template"}'
+              -d '{"event_type":"update-hook-template","client_payload":{"ref":"${{ github.sha }}","repository":"${{ github.repository }}"}}'
           done
