@@ -2,7 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Repository Model
+## Session Startup (RUN FIRST — before any other action)
+
+At the start of every session, Claude MUST:
+
+1. **Load memory.** Read `/mnt/develop/AI_Research/memory/MEMORY.md` and all files it links to (user profile, current work, feedback, references). Do not skip this — the user's machine freezes and sessions can end abruptly. Memory is the only continuity between sessions.
+
+2. **Load oh-my-claudecode.** List agents at `oh-my-claudecode/agents/` and skills at `oh-my-claudecode/skills/`. These are the development toolchain — 19 specialist agents (planner, code-reviewer, git-master, qa-tester, verifier, etc.) and skills (autopilot, debug, etc.). Use them instead of working directly whenever appropriate.
+
+3. **Check git state across all repos.** Run `git status` in the root and each child repo. Understand what branch is active and whether anything is dirty before acting.
+
+4. **Report what you found.** Tell the user: current branch, dirty files, available agents/skills, and what was being worked on last (from memory). Then ask what to continue with.
+
+**Hard rule:** Do not write, edit, push, or execute anything until these four steps are complete.
 
 This is a **meta-repo** at `/mnt/develop/AI_Research`. The root tracks only workspace-level docs, scripts, and onboarding — not child project source code. Each child project keeps its own Git history and remote:
 
