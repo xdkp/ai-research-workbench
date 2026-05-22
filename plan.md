@@ -452,7 +452,7 @@ Portal — operator sees threat intel + confidence profile, triages
 ```
 hermes-agent/scripts/
   uqlm_verify.py          ← NEW: wraps UQLM for enrichment verification
-  csp-audit-task-runner.py ← MODIFY: calls uqlm_verify after Fabric, before API POST
+  offensive-research-portal-task-runner.py ← MODIFY: calls uqlm_verify after Fabric, before API POST
 ```
 
 `uqlm_verify.py` exposes one async function:
@@ -714,9 +714,9 @@ This policy cannot drift, be overridden by model routing, or bypassed by failove
 | # | File | Action |
 |---|------|--------|
 | 1 | `hermes-agent/scripts/uqlm_verify.py` | Create — wraps BlackBoxUQ + LongTextUQ for enrichment verification |
-| 2 | `hermes-agent/scripts/csp-audit-task-runner.py` | Modify — call uqlm_verify after Fabric, before API POST |
-| 3 | `csp-audit/report-viewer/lib/enrichment-gate.ts` | Modify — add Layer 2 UQLM score interpretation |
-| 4 | `csp-audit/report-viewer/lib/__tests__/enrichment-gate.test.ts` | Modify — add UQLM Layer 2 test cases |
+| 2 | `hermes-agent/scripts/offensive-research-portal-task-runner.py` | Modify — call uqlm_verify after Fabric, before API POST |
+| 3 | `offensive-research-portal/report-viewer/lib/enrichment-gate.ts` | Modify — add Layer 2 UQLM score interpretation |
+| 4 | `offensive-research-portal/report-viewer/lib/__tests__/enrichment-gate.test.ts` | Modify — add UQLM Layer 2 test cases |
 | 5 | `hermes-agent/Dockerfile.gateway` | Modify — install uqlm + langchain-ollama |
 
 ### UQLM initialization pattern (from tests)
@@ -767,13 +767,13 @@ luq = LongTextUQ(llm=llm,
 ProviderRouter + CircuitBreaker in Rust. Portal has `model-router.ts` — separate implementation. Skill manager UI not built. Runtime path with Hermes not verified.
 
 ### Hermes
-Gateway heartbeat + task claim + receipt mode working. Analysis mode with Fabric enrichment, quarantine child-tasks, action classification, and browser validation in `csp-audit-task-runner.py` (745 lines). Vuln intel adapter built (893 lines). Custom Fabric patterns not in Docker image. Fingerprint standardized. UQLM integration not started.
+Gateway heartbeat + task claim + receipt mode working. Analysis mode with Fabric enrichment, quarantine child-tasks, action classification, and browser validation in `offensive-research-portal-task-runner.py` (1100+ lines). Vuln intel adapter built (893 lines). UQLM Layer 2 verification adapter built (`uqlm_verify.py`, 300+ lines, 38 tests). Custom Fabric patterns not in Docker image. Fingerprint standardized.
 
 ### Fabric
 CLI v1.4.452 installed. All 4 custom patterns on disk. Not verified with real findings. Not configured with model API. Patterns not in Docker image.
 
 ### UQLM
-Library cloned at `uqlm/` (v0.5.11, Apache 2.0). Tests studied — API surface understood. Scorer-to-field mapping done. Integration code not written. Dependencies (langchain, sentence-transformers, etc.) not installed in Hermes container.
+Library cloned at `uqlm/` (v0.5.11, Apache 2.0). Adapter built (`uqlm_verify.py`) with BlackBoxUQ + LongTextUQ wrappers, field-level scorer configuration per engagement, and composite scoring. Layer 2 cooperative gate wired in enrichment-gate.ts with 8 test cases. Dependencies in Dockerfile.gateway, installed at boot via gateway-bootstrap.sh.
 
 ### Portal
 All 8 targeted routes hardened. Hallucination gate Layer 1 active (18 tests). `createSecureApiHandler` passes route context for dynamic routes. Triage detail panel and evidence workflow not complete.
@@ -785,9 +785,9 @@ All 8 targeted routes hardened. Hallucination gate Layer 1 active (18 tests). `c
 Schema built (17 tables, v3). `enrich_vuln_intel` Fabric pattern created (139 lines). Hermes vuln intel adapter built (893 lines, `hermes-agent/scripts/vuln_intel_adapter.py`): NVD via CPE/keyword search, CISA KEV full-catalog check, EPSS single + batch lookup, OSV package/version query, Playwright fallback for vendor HTML, SQLite cache read/write, rate limiter per source, circuit breaker (3 failures → 5min open), retry with exponential backoff + Retry-After header respect. Sync worker not created.
 
 ### Safety & Resilience
-Layer 1 hallucination gate built. Layer 2 UQLM pending. Idempotency built. Crash recovery: schema built (checkpoint table), worker not built. Offline buffer: schema built (sync_queue table), sync worker not built.
+Layer 1 + Layer 2 (UQLM) hallucination gates built. UQLM scores written to audit_log. Idempotency built. Crash recovery: schema built (checkpoint table), worker not built. Offline buffer: schema built (sync_queue table), sync worker not built.
 
-Detailed phase tracking: `csp-audit/plan.md` (Phase 0–12)
+Detailed phase tracking: `offensive-research-portal/plan.md` (Phase 0–12)
 
 ---
 
@@ -804,15 +804,15 @@ Detailed phase tracking: `csp-audit/plan.md` (Phase 0–12)
 - [x] Crash checkpoints + offline buffer worker (sync_worker.py + task runner checkpoint logic)
 - [x] cc-switch ↔ Hermes + Fabric runtime wiring (Dockerfile, Fabric patterns, report mode, task polling)
 - [x] Portal cleaned to read-only dashboard (setup wizard removed, model config moved to cc-switch)
-- [ ] Operator triage with quarantine gates
-- [ ] cc-switch → Supabase model sync (model configs, selections, usage)
+- [x] Operator triage with quarantine gates
+- [x] cc-switch → Supabase model sync (model configs, selections, usage)
 
 ### Release B — UQLM Integration
-- [ ] `uqlm_verify.py` adapter module
-- [ ] UQLM Layer 2 in enrichment gate
-- [ ] Dockerfile.gateway updated with uqlm + langchain-ollama
-- [ ] Field-level scorer configuration per engagement
-- [ ] UQLM confidence in audit_log
+- [x] `uqlm_verify.py` adapter module
+- [x] UQLM Layer 2 in enrichment gate
+- [x] Dockerfile.gateway updated with uqlm + langchain-ollama
+- [x] Field-level scorer configuration per engagement
+- [x] UQLM confidence in audit_log
 
 ### Release C — Advanced Automation
 - [ ] Dynamic model routing with cc-switch
@@ -840,11 +840,11 @@ Detailed phase tracking: `csp-audit/plan.md` (Phase 0–12)
 
 | What | Where |
 |------|-------|
-| Implementation phases (0–12) | `csp-audit/plan.md` |
-| Database schema | `csp-audit/supabase/schema.sql` |
-| Foundation migrations | `csp-audit/supabase/phase_minus_1_schema.sql` |
-| Hallucination gate (Layer 1) | `csp-audit/report-viewer/lib/enrichment-gate.ts` |
-| Fingerprint formula (Python) | `hermes-agent/scripts/csp-audit-task-runner.py:231` |
+| Implementation phases (0–12) | `offensive-research-portal/plan.md` |
+| Database schema | `offensive-research-portal/supabase/schema.sql` |
+| Foundation migrations | `offensive-research-portal/supabase/phase_minus_1_schema.sql` |
+| Hallucination gate (Layer 1) | `offensive-research-portal/report-viewer/lib/enrichment-gate.ts` |
+| Fingerprint formula (Python) | `hermes-agent/scripts/offensive-research-portal-task-runner.py:231` |
 | Component contracts | `docs/integrations/` |
 | Operational runbooks | `docs/operations/` |
 | Stack map & config | `docs/stack-map/` |
@@ -860,8 +860,8 @@ Detailed phase tracking: `csp-audit/plan.md` (Phase 0–12)
 | UQLM scorer definitions | `uqlm/docs/source/scorer_definitions/` |
 | UQLM test suite | `uqlm/tests/` |
 | Agent development rules | `CLAUDE.md` (Agent Development Rules section) |
-| CI/CD workflows | `csp-audit/.github/workflows/` |
-| CODEOWNERS | `csp-audit/.github/CODEOWNERS` |
+| CI/CD workflows | `offensive-research-portal/.github/workflows/` |
+| CODEOWNERS | `offensive-research-portal/.github/CODEOWNERS` |
 
 ---
 
@@ -896,7 +896,7 @@ develop → auto-sync to main → manual deploy to production
 **Pre-PR verification commands (run these locally before opening a PR):**
 
 ```bash
-# csp-audit
+# offensive-research-portal
 pnpm test
 pnpm --prefix report-viewer lint
 pnpm --prefix report-viewer exec vitest run

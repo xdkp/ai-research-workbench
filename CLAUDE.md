@@ -20,7 +20,7 @@ This is a **meta-repo** at `/mnt/develop/AI_Research`. The root tracks only work
 
 | Project | Role | Primary Remote |
 |---------|------|----------------|
-| `csp-audit` | Security workflow system of record (Next.js + Supabase) | `github.com/xdkp/csp-audit.git` |
+| `offensive-research-portal` | Security workflow system of record (Next.js + Supabase) | `github.com/xdkp/offensive-research-portal.git` |
 | `hermes-agent` | Agent runtime, CLI/TUI, gateway, skills (Python) | `github.com/NousResearch/hermes-agent.git` |
 | `Fabric` | Prompt-pattern library (Go, Markdown) | `github.com/danielmiessler/Fabric.git` |
 | `cc-switch` | Provider/profile switching for AI CLI tools (Tauri/Rust) | `github.com/xdkp/cc-switch-custom.git` |
@@ -32,14 +32,14 @@ Child repos are in `.gitignore`. Do not force them into the root repo.
 
 ## System of Record
 
-`csp-audit` is the single source of truth for security workflow data. The pipeline is:
+`offensive-research-portal` is the single source of truth for security workflow data. The pipeline is:
 
 ```
 scope -> approved task -> execution evidence -> structured finding -> operator triage -> final report/export
 ```
 
 **Hard rules:**
-- Do not create a second findings database outside `csp-audit`.
+- Do not create a second findings database outside `offensive-research-portal`.
 - Do not let Fabric, Hermes, or cc-switch become the source of truth for security findings.
 - `SUPABASE_SERVICE_ROLE_KEY` must never appear in browser/client code. All Supabase access goes through server-side Next.js API routes.
 - RLS deny-all on all Supabase tables; only `service_role` bypasses.
@@ -54,7 +54,7 @@ scope -> approved task -> execution evidence -> structured finding -> operator t
 ./scripts/check-repos.sh     # Status of all child repos
 ```
 
-### csp-audit (run from `csp-audit/`)
+### offensive-research-portal (run from `offensive-research-portal/`)
 ```bash
 pnpm test                                              # Root scanner + mapping + DAST gate tests
 pnpm --prefix report-viewer lint                       # ESLint
@@ -74,7 +74,7 @@ hermes gateway     # Start messaging gateway
 
 ### Docker Compose (from root)
 ```bash
-docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway up
+docker compose --env-file docker-compose.env --profile offensive-research-portal --profile hermes-gateway up
 ```
 
 ### Other tools
@@ -86,12 +86,12 @@ ollama list         # Check if Ollama daemon is reachable
 ## Architecture
 
 ### Portal + Supabase data layer
-- **Portal** (`csp-audit/report-viewer`): Next.js 15 app on Vercel. Reads from Supabase, renders dashboards and triage UI.
-- **Database**: Supabase cloud PostgreSQL. Schema in `csp-audit/supabase/schema.sql` (9+ tables: scans, engagements, findings, agent_tasks, agent_instances, agent_task_events, generated_reports, submissions, submission_duplicates, plus workflow_templates, workflow_plans, model_configs, audit_log, approval_policies, system_config).
-- **Local worker** (`csp-audit/csp-playwright-audit.js`): Playwright BFS scanner that polls the portal API for queued scans, executes them, and uploads results. Authenticates with `SCAN_WORKER_TOKEN`.
+- **Portal** (`offensive-research-portal/report-viewer`): Next.js 15 app on Vercel. Reads from Supabase, renders dashboards and triage UI.
+- **Database**: Supabase cloud PostgreSQL. Schema in `offensive-research-portal/supabase/schema.sql` (9+ tables: scans, engagements, findings, agent_tasks, agent_instances, agent_task_events, generated_reports, submissions, submission_duplicates, plus workflow_templates, workflow_plans, model_configs, audit_log, approval_policies, system_config).
+- **Local worker** (`offensive-research-portal/csp-playwright-audit.js`): Playwright BFS scanner that polls the portal API for queued scans, executes them, and uploads results. Authenticates with `SCAN_WORKER_TOKEN`.
 
 ### Agent bridge
-- **Hermes gateway** (`hermes-agent/gateway/`): Claims tasks from csp-audit agent API (`POST /api/agent/tasks/claim`), executes them, posts events and generated reports. Uses `AGENT_TOKEN` for auth.
+- **Hermes gateway** (`hermes-agent/gateway/`): Claims tasks from offensive-research-portal agent API (`POST /api/agent/tasks/claim`), executes them, posts events and generated reports. Uses `AGENT_TOKEN` for auth.
 - **Heartbeat protocol**: Hermes posts to `POST /api/agent/heartbeat` with agent state (idle/busy/paused/waiting_approval). No heartbeat within 60s → agent marked stale.
 - **Task execution modes**: `receipt` (safe default, writes receipt report), `analysis` (in progress, enrichment pipeline).
 
@@ -111,15 +111,15 @@ ollama list         # Check if Ollama daemon is reachable
 | File | Purpose |
 |------|---------|
 | `plan.md` | Product architecture, team design, and safety foundation |
-| `csp-audit/plan.md` | Numbered Phase 0-12 implementation roadmap |
+| `offensive-research-portal/plan.md` | Numbered Phase 0-12 implementation roadmap |
 | `docker-compose.yml` | Local Docker Compose entry point |
 | `docker-compose.env.example` | Template for local secrets (committed, placeholder values) |
 | `docs/stack-map/` | Component map, repository manifest, command map, env var inventory, config ownership |
 | `docs/integrations/` | Integration contracts between components |
 | `docs/operations/current-workspace-status.md` | Live status snapshot of entire workspace |
 | `docs/onboarding/new-machine-setup.md` | New-machine checklist |
-| `csp-audit/docs/agent-task-contract.md` | Agent API contract |
-| `csp-audit/docs/openapi.yaml` | OpenAPI 3.0 spec for Agent API |
+| `offensive-research-portal/docs/agent-task-contract.md` | Agent API contract |
+| `offensive-research-portal/docs/openapi.yaml` | OpenAPI 3.0 spec for Agent API |
 
 ## Secret Management
 
@@ -127,20 +127,20 @@ ollama list         # Check if Ollama daemon is reachable
 - Production: Vercel env vars + GitHub Actions secrets.
 - Never in code: API keys, tokens, passwords.
 - Never expose `SUPABASE_SERVICE_ROLE_KEY` with `NEXT_PUBLIC_` prefix.
-- Agent token: shared secret between Hermes and csp-audit API (`AGENT_TOKEN`).
+- Agent token: shared secret between Hermes and offensive-research-portal API (`AGENT_TOKEN`).
 - Emergency rotation: `docs/operations/account-recovery.md`.
 
 ## Handling Rules for Child Repos
 
-- **csp-audit**: Active development. Do not reset or discard changes. Branch: `develop`.
-- **hermes-agent**: Upstream clone. Local Docker gateway files (`Dockerfile.gateway`, `gateway-bootstrap.sh`, `csp-audit-heartbeat.py`, `csp-audit-task-runner.py`) are workbench integration work — do not push upstream casually.
+- **offensive-research-portal**: Active development. Do not reset or discard changes. Branch: `develop`.
+- **hermes-agent**: Upstream clone. Local Docker gateway files (`Dockerfile.gateway`, `gateway-bootstrap.sh`, `offensive-research-portal-heartbeat.py`, `offensive-research-portal-task-runner.py`) are workbench integration work — do not push upstream casually.
 - **Fabric**: Keep clean unless opening an upstream contribution branch.
 - **cc-switch**: Clean repo. Has large Rust build cache (`src-tauri/target`, ~37GB) — clean only when storage pressure requires it.
 - **oh-my-claudecode**: Reference/config repo.
 - **pentest-ai-agents**: Reference-only for methodology extraction. Do not vendor contents or push changes casually.
 - **uqlm**: Upstream clone (Apache 2.0). Used by Hermes for enrichment verification. Install via pip into Hermes container. Do not push changes upstream casually.
 
-## CI/CD (csp-audit)
+## CI/CD (offensive-research-portal)
 
 - `develop` branch: runs tests, lint, build, preview DAST gate.
 - `main` branch: runs tests, lint, build, production deploy to Vercel, production DAST evidence workflow with HIGH-severity gate.
@@ -161,7 +161,7 @@ These rules apply to Claude Code when working on any project in this workspace. 
 
 For every change, run the project's verification commands locally and confirm they pass before opening a PR:
 
-**csp-audit (from `csp-audit/`):**
+**offensive-research-portal (from `offensive-research-portal/`):**
 ```bash
 pnpm test                                              # scanner + mapping + DAST gate
 pnpm --prefix report-viewer lint                       # ESLint

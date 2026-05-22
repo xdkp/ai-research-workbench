@@ -1,7 +1,7 @@
 
-# Hermes With csp-audit
+# Hermes With offensive-research-portal
 
-`csp-audit` already owns the security workflow spine:
+`offensive-research-portal` already owns the security workflow spine:
 
 ```text
 scope -> approved task -> execution evidence -> structured finding -> operator triage -> final report/export
@@ -12,19 +12,19 @@ Hermes should integrate as an executor and analysis assistant, not as a second c
 ## Target Flow
 
 ```text
-1. Operator creates/updates engagement scope in csp-audit.
-2. Operator creates a task in csp-audit.
-3. csp-audit validates target URL and scope.
+1. Operator creates/updates engagement scope in offensive-research-portal.
+2. Operator creates a task in offensive-research-portal.
+3. offensive-research-portal validates target URL and scope.
 4. Task is pending until approved, unless explicitly not_required.
-5. Hermes claims an eligible task through csp-audit agent APIs.
+5. Hermes claims an eligible task through offensive-research-portal agent APIs.
 6. Hermes executes only the allowed workflow.
 7. Hermes posts task events, evidence, generated report material, and candidate finding data.
-8. csp-audit stores structured findings and triage status.
+8. offensive-research-portal stores structured findings and triage status.
 9. Operator confirms, rejects, edits, or submits findings.
-10. csp-audit exports/generates final report material from approved records.
+10. offensive-research-portal exports/generates final report material from approved records.
 ```
 
-## csp-audit Owns
+## offensive-research-portal Owns
 
 - Engagements and scope.
 - Task creation, status, and approval status.
@@ -43,7 +43,7 @@ Hermes should integrate as an executor and analysis assistant, not as a second c
 
 ## Integration Contract
 
-Hermes must treat `csp-audit` task fields as binding:
+Hermes must treat `offensive-research-portal` task fields as binding:
 
 ```text
 target_url
@@ -57,7 +57,7 @@ engagement_id
 reference_url
 ```
 
-Hermes must not execute work for tasks that are not claimable by the csp-audit API.
+Hermes must not execute work for tasks that are not claimable by the offensive-research-portal API.
 
 Hermes should emit enough trace for review:
 
@@ -72,9 +72,9 @@ completed summary
 
 ## Report Rule
 
-Agent-generated text is draft material until the operator confirms it in `csp-audit`.
+Agent-generated text is draft material until the operator confirms it in `offensive-research-portal`.
 
-Final report content should come from approved/confirmed csp-audit records, not from Hermes memory alone.
+Final report content should come from approved/confirmed offensive-research-portal records, not from Hermes memory alone.
 
 ## First Local Proof Workflow
 
@@ -82,21 +82,21 @@ Before wiring a long-running Hermes worker, prove the local stack in this order:
 
 ```text
 1. Run the workbench doctor.
-2. Run csp-audit tests and report-viewer checks.
+2. Run offensive-research-portal tests and report-viewer checks.
 3. Start report-viewer locally at http://127.0.0.1:3000.
-4. Create or inspect a scoped csp-audit task locally.
+4. Create or inspect a scoped offensive-research-portal task locally.
 5. Use Hermes/Fabric only to draft analysis or report material.
-6. Save approved evidence, findings, and final report material back in csp-audit.
+6. Save approved evidence, findings, and final report material back in offensive-research-portal.
 ```
 
 Current local proof result, checked 2026-05-12:
 
 ```text
 PASS  doctor and toolchain checks
-PASS  csp-audit tests
+PASS  offensive-research-portal tests
 PASS  report-viewer lint, vitest, and build
 PASS  local report-viewer HTTP probe
 WARN  ops:validate still expects Vercel/env setup that is intentionally paused
 ```
 
-Do not use Hermes memory, Fabric output, or local notes as the final report source. They are draft inputs. `csp-audit` remains the durable record for task state, evidence, findings, approvals, and report output.
+Do not use Hermes memory, Fabric output, or local notes as the final report source. They are draft inputs. `offensive-research-portal` remains the durable record for task state, evidence, findings, approvals, and report output.

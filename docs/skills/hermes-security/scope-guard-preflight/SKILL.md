@@ -7,7 +7,7 @@ metadata:
   workbench:
     source: pentest-ai-agents/.claude/agents/_scope-guard.md
     action_class: advisory
-    csp_audit_required: true
+    orp_required: true
     live_target_commands: false
 ---
 
@@ -19,11 +19,11 @@ Use this skill before Hermes accepts, plans, or executes any security task.
 
 Confirm that the task has enough authorized context to proceed and that Hermes is not relying on prompt text alone for safety.
 
-`csp-audit` remains authoritative for target validation, engagement scope, approval state, task events, evidence, findings, and reports.
+`offensive-research-portal` remains authoritative for target validation, engagement scope, approval state, task events, evidence, findings, and reports.
 
 ## Required Inputs
 
-- csp-audit task ID, if already created.
+- offensive-research-portal task ID, if already created.
 - Engagement ID or scope block.
 - Target URL, domain, repository, or artifact identifier.
 - Requested action class:
@@ -32,13 +32,13 @@ Confirm that the task has enough authorized context to proceed and that Hermes i
   - `active_non_destructive`
   - `exploit_capable`
   - `restricted`
-- Operator approval status from csp-audit.
+- Operator approval status from offensive-research-portal.
 - Evidence/output destination.
 
 ## Decision Rules
 
 1. If there is no scope context, stop and request scope.
-2. If the target is not represented in csp-audit scope, stop.
+2. If the target is not represented in offensive-research-portal scope, stop.
 3. If the target matches out-of-scope rules, stop.
 4. If the task requires active target interaction and approval is not granted, stop.
 5. If the task asks for destructive behavior, denial of service, phishing, C2, persistence, credential abuse, or payload crafting, classify it as `restricted` and stop unless a separate written authorization path exists.

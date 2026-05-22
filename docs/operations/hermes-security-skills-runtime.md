@@ -32,14 +32,14 @@ The skills are extracted from `pentest-ai-agents` methodology and intentionally 
 
 ## Control Boundary
 
-These skills can help Hermes reason, draft, and summarize. They do not replace csp-audit controls.
+These skills can help Hermes reason, draft, and summarize. They do not replace offensive-research-portal controls.
 
 Required control path:
 
 ```text
-csp-audit scope and task approval
+offensive-research-portal scope and task approval
 -> Hermes skill-assisted execution or drafting
--> csp-audit events/evidence/generated reports
+-> offensive-research-portal events/evidence/generated reports
 -> operator triage
 -> approved finding/report output
 ```

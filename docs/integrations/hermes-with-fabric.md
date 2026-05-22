@@ -24,15 +24,15 @@ Fabric owns reusable prompt patterns.
 
 Hermes may call, adapt, or wrap patterns into skills.
 
-`csp-audit` owns final security evidence and findings.
+`offensive-research-portal` owns final security evidence and findings.
 
 ## Safe Usage Pattern
 
 ```text
-raw evidence from csp-audit/Hermes tools
+raw evidence from offensive-research-portal/Hermes tools
 → Fabric pattern helps analyze or draft text
 → Hermes returns candidate material
-→ csp-audit stores structured finding/evidence
+→ offensive-research-portal stores structured finding/evidence
 → operator approves or edits
 ```
 

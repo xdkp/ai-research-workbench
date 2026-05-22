@@ -16,9 +16,9 @@ check_file() {
   if [ -f "$file" ]; then ok "$label"; else warn "$label missing"; fi
 }
 
-check_file "$ROOT/csp-audit/package.json" "csp-audit package.json"
-check_file "$ROOT/csp-audit/report-viewer/package.json" "csp-audit report-viewer package.json"
-check_file "$ROOT/csp-audit/supabase/schema.sql" "csp-audit Supabase schema"
+check_file "$ROOT/offensive-research-portal/package.json" "offensive-research-portal package.json"
+check_file "$ROOT/offensive-research-portal/report-viewer/package.json" "offensive-research-portal report-viewer package.json"
+check_file "$ROOT/offensive-research-portal/supabase/schema.sql" "offensive-research-portal Supabase schema"
 check_file "$ROOT/hermes-agent/pyproject.toml" "hermes-agent pyproject.toml"
 check_file "$ROOT/hermes-agent/uv.lock" "hermes-agent uv.lock"
 check_file "$ROOT/Fabric/go.mod" "Fabric go.mod"
@@ -27,7 +27,7 @@ check_file "$ROOT/cc-switch/src-tauri/Cargo.toml" "cc-switch Cargo.toml"
 check_file "$ROOT/oh-my-claudecode/package.json" "oh-my-claudecode package.json"
 
 printf '\nDirty state summary\n'
-for repo in Fabric cc-switch csp-audit hermes-agent oh-my-claudecode; do
+for repo in Fabric cc-switch offensive-research-portal hermes-agent oh-my-claudecode; do
   if [ -d "$ROOT/$repo/.git" ]; then
     count=$(git -C "$ROOT/$repo" status --short 2>/dev/null | wc -l | tr -d ' ')
     if [ "$count" = "0" ]; then

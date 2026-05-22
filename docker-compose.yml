@@ -1,9 +1,9 @@
 services:
-  csp-report-viewer:
+  offensive-research-portal:
     build:
-      context: ./csp-audit/report-viewer
+      context: ./offensive-research-portal/report-viewer
       dockerfile: Dockerfile
-    image: ai-research-workbench/csp-report-viewer:local
+    image: ai-research-workbench/offensive-research-portal:local
     ports:
       - "3000:3000"
     environment:
@@ -35,14 +35,14 @@ services:
 
   csp-scan-worker:
     build:
-      context: ./csp-audit
+      context: ./offensive-research-portal
       dockerfile: Dockerfile.worker
     image: ai-research-workbench/csp-scan-worker:local
     depends_on:
-      csp-report-viewer:
+      offensive-research-portal:
         condition: service_healthy
     environment:
-      REPORT_VIEWER_BASE_URL: http://csp-report-viewer:3000
+      REPORT_VIEWER_BASE_URL: http://offensive-research-portal:3000
       SCAN_WORKER_TOKEN: ${SCAN_WORKER_TOKEN:-replace-me}
       SCAN_BASIC_AUTH_USER: ${SCAN_BASIC_AUTH_USER:-}
       SCAN_BASIC_AUTH_PASSWORD: ${SCAN_BASIC_AUTH_PASSWORD:-}
@@ -57,19 +57,19 @@ services:
       dockerfile: Dockerfile.gateway
     image: ai-research-workbench/hermes-gateway:local
     depends_on:
-      csp-report-viewer:
+      offensive-research-portal:
         condition: service_healthy
     environment:
       HERMES_HOME: /data/hermes
       AGENT_TOKEN: ${AGENT_TOKEN:-replace-me}
-      CSP_AUDIT_BASE_URL: http://csp-report-viewer:3000
-      CSP_AUDIT_AGENT_NAME: ${CSP_AUDIT_AGENT_NAME:-hermes-gateway}
-      CSP_AUDIT_AGENT_MODEL: ${CSP_AUDIT_AGENT_MODEL:-hermes-gateway}
-      CSP_AUDIT_AGENT_PROFILE: ${CSP_AUDIT_AGENT_PROFILE:-default}
-      CSP_AUDIT_HEARTBEAT_INTERVAL_SECONDS: ${CSP_AUDIT_HEARTBEAT_INTERVAL_SECONDS:-30}
-      CSP_AUDIT_TASK_POLL_ENABLED: ${CSP_AUDIT_TASK_POLL_ENABLED:-true}
-      CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS: ${CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS:-30}
-      CSP_AUDIT_TASK_EXECUTION_MODE: ${CSP_AUDIT_TASK_EXECUTION_MODE:-analysis}
+      ORP_BASE_URL: http://offensive-research-portal:3000
+      ORP_AGENT_NAME: ${ORP_AGENT_NAME:-hermes-gateway}
+      ORP_AGENT_MODEL: ${ORP_AGENT_MODEL:-hermes-gateway}
+      ORP_AGENT_PROFILE: ${ORP_AGENT_PROFILE:-default}
+      ORP_HEARTBEAT_INTERVAL_SECONDS: ${ORP_HEARTBEAT_INTERVAL_SECONDS:-30}
+      ORP_TASK_POLL_ENABLED: ${ORP_TASK_POLL_ENABLED:-true}
+      ORP_TASK_POLL_INTERVAL_SECONDS: ${ORP_TASK_POLL_INTERVAL_SECONDS:-30}
+      ORP_TASK_EXECUTION_MODE: ${ORP_TASK_EXECUTION_MODE:-analysis}
       SYNC_WORKER_ENABLED: ${SYNC_WORKER_ENABLED:-true}
       PENTEST_DB_PATH: ${PENTEST_DB_PATH:-/data/hermes/findings.db}
       OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}

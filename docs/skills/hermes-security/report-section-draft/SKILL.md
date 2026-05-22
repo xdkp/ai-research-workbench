@@ -1,6 +1,6 @@
 ---
 name: report-section-draft
-description: Draft report sections from approved csp-audit findings and generated report material.
+description: Draft report sections from approved offensive-research-portal findings and generated report material.
 platforms: [linux, macos, windows]
 category: security
 metadata:
@@ -10,13 +10,13 @@ metadata:
       - pentest-ai-agents/.claude/agents/stig-analyst.md
       - pentest-ai-agents/.claude/agents/detection-engineer.md
     action_class: advisory
-    csp_audit_required: true
+    orp_required: true
     live_target_commands: false
 ---
 
 # Report Section Draft
 
-Use this skill to draft final-report sections from csp-audit records. It must not create new facts outside the approved evidence set.
+Use this skill to draft final-report sections from offensive-research-portal records. It must not create new facts outside the approved evidence set.
 
 ## Purpose
 
@@ -24,9 +24,9 @@ Generate readable report material without forcing the operator to write everythi
 
 ## Allowed Inputs
 
-- Approved csp-audit findings.
+- Approved offensive-research-portal findings.
 - Operator-confirmed evidence.
-- Generated report material stored in csp-audit.
+- Generated report material stored in offensive-research-portal.
 - Engagement metadata and scope.
 - Remediation notes and defensive detections.
 
@@ -34,7 +34,7 @@ Generate readable report material without forcing the operator to write everythi
 
 1. Use approved findings and evidence only.
 2. Do not include draft/unconfirmed findings in final language unless explicitly labeled.
-3. Preserve severity and triage decisions from csp-audit.
+3. Preserve severity and triage decisions from offensive-research-portal.
 4. Keep executive summaries non-alarmist and evidence-backed.
 5. Separate remediation guidance from exploit narrative.
 6. Redact secrets, tokens, and unnecessary personal data.
@@ -61,6 +61,6 @@ Generate readable report material without forcing the operator to write everythi
 ### Appendix: Evidence Index
 ```
 
-## csp-audit Mapping
+## offensive-research-portal Mapping
 
-The generated section should be stored as csp-audit generated report material and should link back to approved finding IDs.
+The generated section should be stored as offensive-research-portal generated report material and should link back to approved finding IDs.

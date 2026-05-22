@@ -23,7 +23,7 @@ Do not assume root-level docs are tracked by Git unless a valid root repo is cre
 
 ## Vercel Fails In CI
 
-If Preview DAST secrets are missing, csp-audit CI should skip Preview DAST cleanly.
+If Preview DAST secrets are missing, offensive-research-portal CI should skip Preview DAST cleanly.
 
 If deploy or production DAST is intended, check:
 
@@ -37,9 +37,9 @@ report-viewer root directory
 
 ## Findings Or Reports Are Confusing
 
-Use `csp-audit` as source of truth.
+Use `offensive-research-portal` as source of truth.
 
-Hermes/Fabric output is draft material until confirmed/triaged in `csp-audit`.
+Hermes/Fabric output is draft material until confirmed/triaged in `offensive-research-portal`.
 
 ## Disk Space Is Disappearing
 

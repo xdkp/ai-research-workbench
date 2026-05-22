@@ -28,7 +28,7 @@ Do not use it for:
 - authoritative evidence records
 - production secrets inventory
 
-Those belong in `csp-audit` and/or external secret stores.
+Those belong in `offensive-research-portal` and/or external secret stores.
 
 ## Sync Policy
 

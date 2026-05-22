@@ -14,19 +14,19 @@ docker-compose.env -> Compose container env -> /data/hermes/.env inside hermes-h
 
 | Variable | Required For | Notes |
 | --- | --- | --- |
-| `AGENT_TOKEN` | csp-audit Agent API | Shared by report viewer and Hermes gateway |
-| `SUPABASE_URL` | csp-audit persistent state | Server-side only |
-| `SUPABASE_SERVICE_ROLE_KEY` | csp-audit persistent state | Never expose to browser or logs |
-| `CSP_AUDIT_BASE_URL` | gateway bridge | Compose internal URL, normally `http://csp-report-viewer:3000` |
+| `AGENT_TOKEN` | offensive-research-portal Agent API | Shared by report viewer and Hermes gateway |
+| `SUPABASE_URL` | offensive-research-portal persistent state | Server-side only |
+| `SUPABASE_SERVICE_ROLE_KEY` | offensive-research-portal persistent state | Never expose to browser or logs |
+| `ORP_BASE_URL` | gateway bridge | Compose internal URL, normally `http://offensive-research-portal:3000` |
 | `OPENROUTER_API_KEY` or another provider key | Hermes reasoning | Pick one provider for Hermes |
 
 Optional task bridge values:
 
 | Variable | Default | Notes |
 | --- | --- | --- |
-| `CSP_AUDIT_TASK_POLL_ENABLED` | `false` | Set `true` only when the gateway should consume tasks |
-| `CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS` | `60` | Task claim poll interval |
-| `CSP_AUDIT_TASK_EXECUTION_MODE` | `receipt` | Current safe proof mode; performs no target testing |
+| `ORP_TASK_POLL_ENABLED` | `false` | Set `true` only when the gateway should consume tasks |
+| `ORP_TASK_POLL_INTERVAL_SECONDS` | `60` | Task claim poll interval |
+| `ORP_TASK_EXECUTION_MODE` | `receipt` | Current safe proof mode; performs no target testing |
 
 ## Seeding Behavior
 
@@ -35,8 +35,8 @@ On container start, `hermes-agent/scripts/gateway-bootstrap.sh` copies selected 
 The bootstrap starts:
 
 ```text
-csp-audit-heartbeat.py       always, when base URL and token are present
-csp-audit-task-runner.py     only when CSP_AUDIT_TASK_POLL_ENABLED=true
+offensive-research-portal-heartbeat.py       always, when base URL and token are present
+offensive-research-portal-task-runner.py     only when ORP_TASK_POLL_ENABLED=true
 hermes gateway               foreground process
 ```
 
@@ -46,7 +46,7 @@ hermes gateway               foreground process
 2. Restart affected services.
 
 ```bash
-docker compose --env-file docker-compose.env --profile csp-audit restart
+docker compose --env-file docker-compose.env --profile offensive-research-portal restart
 docker compose --env-file docker-compose.env --profile hermes-gateway restart hermes-gateway
 ```
 
@@ -63,8 +63,8 @@ Use checks that prove presence without printing secret values:
 
 ```bash
 docker compose --env-file docker-compose.env --profile hermes-gateway logs --tail=80 hermes-gateway
-docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway ps
-docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway config --quiet
+docker compose --env-file docker-compose.env --profile offensive-research-portal --profile hermes-gateway ps
+docker compose --env-file docker-compose.env --profile offensive-research-portal --profile hermes-gateway config --quiet
 ```
 
 Inside-container presence check without values:
@@ -75,7 +75,7 @@ docker exec ai_research-hermes-gateway-1 sh -lc 'test -s /data/hermes/.env && ec
 
 ## API Endpoints Used
 
-The gateway uses these csp-audit endpoints with `Authorization: Bearer <AGENT_TOKEN>`:
+The gateway uses these offensive-research-portal endpoints with `Authorization: Bearer <AGENT_TOKEN>`:
 
 ```text
 POST  /api/agent/heartbeat

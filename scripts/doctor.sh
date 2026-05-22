@@ -34,6 +34,6 @@ printf '%s\n' \
   'docs/stack-map/component-map.md' \
   'docs/stack-map/repository-manifest.md' \
   'docs/stack-map/config-ownership.md' \
-  'docs/integrations/hermes-with-csp-audit.md'
+  'docs/integrations/hermes-with-offensive-research-portal.md'
 
 exit "$status"

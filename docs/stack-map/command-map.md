@@ -12,11 +12,11 @@ Run commands from the listed directory unless noted.
 | Start Hermes | `hermes` | any | CLI/TUI entry |
 | Start Hermes gateway | `hermes gateway` | any | Optional messaging layer |
 | Fabric help | `fabric --help` | any | Requires Fabric installed |
-| csp-audit tests | `pnpm test` | `csp-audit` | No Vercel required |
-| csp-audit setup validation | `pnpm ops:validate` | `csp-audit` | Read-only setup validation |
-| report-viewer lint | `pnpm --prefix report-viewer lint` | `csp-audit` | No Vercel required |
-| report-viewer tests | `pnpm --prefix report-viewer exec vitest run` | `csp-audit` | No Vercel required |
-| report-viewer build | `pnpm --prefix report-viewer build` | `csp-audit` | No Vercel account required |
+| offensive-research-portal tests | `pnpm test` | `offensive-research-portal` | No Vercel required |
+| offensive-research-portal setup validation | `pnpm ops:validate` | `offensive-research-portal` | Read-only setup validation |
+| report-viewer lint | `pnpm --prefix report-viewer lint` | `offensive-research-portal` | No Vercel required |
+| report-viewer tests | `pnpm --prefix report-viewer exec vitest run` | `offensive-research-portal` | No Vercel required |
+| report-viewer build | `pnpm --prefix report-viewer build` | `offensive-research-portal` | No Vercel account required |
 | cc-switch typecheck | `pnpm typecheck` | `cc-switch` | Desktop project check |
 | cc-switch unit tests | `pnpm test:unit` | `cc-switch` | If deps installed |
 | GitHub auth check | `gh auth status` | any | External auth check |

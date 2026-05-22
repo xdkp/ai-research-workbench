@@ -1,6 +1,6 @@
 ---
 name: finding-draft-from-evidence
-description: Draft a structured security finding from csp-audit evidence while leaving confirmation to the operator.
+description: Draft a structured security finding from offensive-research-portal evidence while leaving confirmation to the operator.
 platforms: [linux, macos, windows]
 category: security
 metadata:
@@ -9,13 +9,13 @@ metadata:
       - pentest-ai-agents/.claude/agents/poc-validator.md
       - pentest-ai-agents/.claude/agents/report-generator.md
     action_class: advisory
-    csp_audit_required: true
+    orp_required: true
     live_target_commands: false
 ---
 
 # Finding Draft From Evidence
 
-Use this skill after evidence has already been collected and stored through csp-audit task events, scan output, generated reports, or operator notes.
+Use this skill after evidence has already been collected and stored through offensive-research-portal task events, scan output, generated reports, or operator notes.
 
 ## Purpose
 
@@ -23,7 +23,7 @@ Turn evidence into a draft finding that an operator can confirm, reject, or edit
 
 ## Required Inputs
 
-- Evidence excerpts or csp-audit evidence IDs.
+- Evidence excerpts or offensive-research-portal evidence IDs.
 - Affected target/path/component.
 - Observed behavior.
 - Expected secure behavior.
@@ -69,6 +69,6 @@ Turn evidence into a draft finding that an operator can confirm, reject, or edit
 - [ ] PII/secrets reviewed
 ```
 
-## csp-audit Mapping
+## offensive-research-portal Mapping
 
 The output maps to a draft `findings` record and should not be treated as a confirmed report item until operator triage is complete.

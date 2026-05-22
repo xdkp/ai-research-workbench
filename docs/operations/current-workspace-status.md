@@ -18,7 +18,7 @@ Current implementation status:
 P1 complete: workspace front door and docs exist
 P2 complete: integration contracts exist
 P3 complete: read-only health checks exist and pass
-P4 in progress: Docker Compose covers csp-audit report viewer, scan worker, and Hermes gateway; heartbeat and receipt-mode task bridge are live and proved locally; first low-risk Hermes security skill specs extracted from pentest-ai-agents methodology and mounted read-only into Hermes gateway by Docker Compose
+P4 in progress: Docker Compose covers offensive-research-portal report viewer, scan worker, and Hermes gateway; heartbeat and receipt-mode task bridge are live and proved locally; first low-risk Hermes security skill specs extracted from pentest-ai-agents methodology and mounted read-only into Hermes gateway by Docker Compose
 ```
 
 ## Workspace Meta-Repo
@@ -57,7 +57,7 @@ Ignored child repositories:
 ```text
 Fabric/
 cc-switch/
-csp-audit/
+offensive-research-portal/
 hermes-agent/
 oh-my-claudecode/
 ```
@@ -80,13 +80,13 @@ scope
 -> report export
 ```
 
-`csp-audit` is the system of record for this workflow. Hermes, Fabric, cc-switch, Ollama, Codex, Claude Code, and extracted `pentest-ai-agents` methodology are support tools around that control plane.
+`offensive-research-portal` is the system of record for this workflow. Hermes, Fabric, cc-switch, Ollama, Codex, Claude Code, and extracted `pentest-ai-agents` methodology are support tools around that control plane.
 
 ## Child Project Roles
 
 | Project | Role | Ownership status |
 | --- | --- | --- |
-| `csp-audit` | Security control plane, scans, findings, approvals, report viewer, DAST gate | Active local development; local Hermes receipt bridge proved on feature branch |
+| `offensive-research-portal` | Security control plane, scans, findings, approvals, report viewer, DAST gate | Active local development; local Hermes receipt bridge proved on feature branch |
 | `hermes-agent` | Agent runtime, orchestration, skills, gateway, CLI/TUI/web surfaces | Upstream clone plus local Docker gateway integration files; do not push upstream casually |
 | `Fabric` | Prompt/pattern library and analysis patterns | Upstream clone, keep clean |
 | `cc-switch` | Claude Code / Codex style switching and local helper tooling | Clean child repo, has large Rust build cache |
@@ -96,7 +96,7 @@ scope
 
 ## Methodology Reference State
 
-`pentest-ai-agents` is present as a local reference source for security methodology extraction. It is not an implementation target for the root meta-repo and should not be committed wholesale. If represented by a gitlink, only the pointer is tracked; internal source changes stay in that repo. The approved use is to extract scope-guard language, role methodology, reporting structure, and low-risk advisory workflows into Hermes-compatible skills while keeping task approval, evidence, findings, and reports in `csp-audit`.
+`pentest-ai-agents` is present as a local reference source for security methodology extraction. It is not an implementation target for the root meta-repo and should not be committed wholesale. If represented by a gitlink, only the pointer is tracked; internal source changes stay in that repo. The approved use is to extract scope-guard language, role methodology, reporting structure, and low-risk advisory workflows into Hermes-compatible skills while keeping task approval, evidence, findings, and reports in `offensive-research-portal`.
 
 Extraction map:
 
@@ -163,7 +163,7 @@ cargo clean
 
 Do not clean it automatically during normal workspace checks.
 
-### `csp-audit`
+### `offensive-research-portal`
 
 Current status:
 
@@ -175,7 +175,7 @@ Branch state:
 
 ```text
 feature/phase5-model-router-extend: 903ab95 (pushed to origin)
-develop/main: managed by csp-audit branch workflow outside this local receipt proof
+develop/main: managed by offensive-research-portal branch workflow outside this local receipt proof
 ```
 
 Recently completed work:
@@ -209,7 +209,7 @@ Handling rule:
 This repo is active work. Do not reset or discard changes.
 ```
 
-The first Compose slice for `csp-audit` lives at `docker-compose.yml` and currently includes the report viewer and scan worker. The Hermes gateway now has its own optional profile in the same file, seeds its runtime credentials into `hermes-home/.env`, and emits csp-audit heartbeats.
+The first Compose slice for `offensive-research-portal` lives at `docker-compose.yml` and currently includes the report viewer and scan worker. The Hermes gateway now has its own optional profile in the same file, seeds its runtime credentials into `hermes-home/.env`, and emits offensive-research-portal heartbeats.
 
 Latest local workflow proof, checked 2026-05-19:
 
@@ -225,14 +225,14 @@ PASS  pnpm --prefix report-viewer lint
 PASS  pnpm --prefix report-viewer exec vitest run
 PASS  pnpm --prefix report-viewer exec tsc --noEmit
 PASS  pnpm --prefix report-viewer build
-PASS  python3 -m py_compile hermes-agent/scripts/csp-audit-heartbeat.py hermes-agent/scripts/csp-audit-task-runner.py
+PASS  python3 -m py_compile hermes-agent/scripts/offensive-research-portal-heartbeat.py hermes-agent/scripts/offensive-research-portal-task-runner.py
 PASS  bash -n hermes-agent/scripts/gateway-bootstrap.sh
-PASS  docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway config --quiet
-PASS  docker compose ps shows csp-report-viewer, csp-scan-worker, and hermes-gateway running
+PASS  docker compose --env-file docker-compose.env --profile offensive-research-portal --profile hermes-gateway config --quiet
+PASS  docker compose ps shows offensive-research-portal, csp-scan-worker, and hermes-gateway running
 PASS  Hermes gateway can read five mounted security skill specs from /data/hermes/skills/security/workbench
 PASS  ./scripts/prove-hermes-security-skills.sh validates Hermes lists all five as local enabled skills
 PASS  report-viewer local HTTP probe: HTTP/1.1 200 OK at http://127.0.0.1:3000
-PASS  csp-report-viewer and hermes-gateway images rebuilt after P4 bridge changes
+PASS  offensive-research-portal and hermes-gateway images rebuilt after P4 bridge changes
 PASS  live /api/agent/heartbeat succeeds from hermes-gateway
 PASS  receipt-mode task consumption succeeds: claimed -> started -> checkpoint -> completed
 PASS  generated receipt report persisted for task 6d409002-89ea-490e-8135-a69302f4410e
@@ -265,8 +265,8 @@ Current local P4 work:
 ```text
 Dockerfile.gateway
 gateway-bootstrap.sh
-csp-audit-heartbeat.py
-csp-audit-task-runner.py
+offensive-research-portal-heartbeat.py
+offensive-research-portal-task-runner.py
 ```
 
 Handling rule:
@@ -396,7 +396,7 @@ none from the current workbench doctor list
 
 Notes:
 
-- `vercel` is installed. A new Vercel account exists, but the csp-audit report-viewer project still needs to be linked/configured to the new account.
+- `vercel` is installed. A new Vercel account exists, but the offensive-research-portal report-viewer project still needs to be linked/configured to the new account.
 - `ollama` is installed, but the local daemon was not reachable during the latest check.
 - `go` caches are configured under `/mnt/develop/build-cache/go` so module/build cache growth stays on the ext4 development partition.
 
@@ -425,8 +425,8 @@ Safe next actions:
 run ./scripts/doctor.sh
 edit workspace docs
 improve onboarding docs
-continue csp-audit local development
-run local csp-audit tests
+continue offensive-research-portal local development
+run local offensive-research-portal tests
 inspect Fabric dirty state read-only
 inspect Hermes lockfile changes read-only
 ```
@@ -457,11 +457,11 @@ do not move Docker root data onto /mnt/develop yet
 
 Recommended next sequence:
 
-1. Build the scoped Hermes analysis/recon adapter behind the existing `CSP_AUDIT_TASK_EXECUTION_MODE` switch; keep `receipt` as the safe default.
+1. Build the scoped Hermes analysis/recon adapter behind the existing `ORP_TASK_EXECUTION_MODE` switch; keep `receipt` as the safe default.
 2. Use `./scripts/prove-hermes-receipt-loop.sh` before changing the Hermes bridge or report-viewer Agent API.
-3. Keep `CSP_AUDIT_TASK_POLL_ENABLED=true` only when intentionally testing gateway task consumption.
-4. Use `docs/integrations/hermes-with-csp-audit.md` as the next implementation contract.
-5. Link/configure the new Vercel project for `csp-audit/report-viewer` only when deployment work resumes.
+3. Keep `ORP_TASK_POLL_ENABLED=true` only when intentionally testing gateway task consumption.
+4. Use `docs/integrations/hermes-with-offensive-research-portal.md` as the next implementation contract.
+5. Link/configure the new Vercel project for `offensive-research-portal/report-viewer` only when deployment work resumes.
 6. Start Ollama only when a local model task needs it.
 7. Keep upstream clones clean unless an explicit upstream contribution branch is opened.
 

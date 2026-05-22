@@ -27,7 +27,7 @@ docker-compose.env
 
 ```text
 AGENT_TOKEN
-CSP_AUDIT_*
+ORP_*
 OPENROUTER_API_KEY / GOOGLE_API_KEY / GEMINI_API_KEY / OLLAMA_API_KEY
 TELEGRAM_BOT_TOKEN / DISCORD_BOT_TOKEN / SLACK_BOT_TOKEN / other bot tokens
 ```
@@ -37,10 +37,10 @@ Only configured, non-empty values are written.
 ## Runtime Processes
 
 ```text
-csp-audit-heartbeat.py
+offensive-research-portal-heartbeat.py
   POST /api/agent/heartbeat
 
-csp-audit-task-runner.py
+offensive-research-portal-task-runner.py
   disabled by default
   when enabled: claim task -> update status -> post events -> post generated receipt report
 
@@ -50,14 +50,14 @@ hermes gateway
 
 ## Task Runner Safety
 
-`CSP_AUDIT_TASK_POLL_ENABLED=false` by default. If enabled, the current runner supports only `CSP_AUDIT_TASK_EXECUTION_MODE=receipt`. Receipt mode proves API plumbing but does not perform external testing against the task target.
+`ORP_TASK_POLL_ENABLED=false` by default. If enabled, the current runner supports only `ORP_TASK_EXECUTION_MODE=receipt`. Receipt mode proves API plumbing but does not perform external testing against the task target.
 
 ## Safe Checks
 
 Do not print token values. Use presence/status checks instead:
 
 ```bash
-docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway ps
+docker compose --env-file docker-compose.env --profile offensive-research-portal --profile hermes-gateway ps
 docker compose --env-file docker-compose.env --profile hermes-gateway logs --tail=80 hermes-gateway
 docker exec ai_research-hermes-gateway-1 sh -lc 'test -s /data/hermes/.env && echo hermes env seeded'
 ```

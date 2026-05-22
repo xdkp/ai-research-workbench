@@ -29,7 +29,7 @@ jobs:
     env:
       REPO_MGMT_PAT: ${{ secrets.REPO_MGMT_PAT }}
       TARGET_REPOS: |
-        xdkp/csp-audit
+        xdkp/offensive-research-portal
         xdkp/hermes-agent
         xdkp/cc-switch-custom
         xdkp/ai-research-workbench

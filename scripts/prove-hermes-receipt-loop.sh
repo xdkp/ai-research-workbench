@@ -32,26 +32,26 @@ printf 'Hermes receipt bridge proof\n'
 printf 'Root: %s\n' "$ROOT"
 printf 'Env: %s\n\n' "$ENV_FILE"
 
-viewer_cid="$(compose ps -q csp-report-viewer 2>/dev/null || true)"
+viewer_cid="$(compose ps -q offensive-research-portal 2>/dev/null || true)"
 gateway_cid="$(compose ps -q hermes-gateway 2>/dev/null || true)"
 
 if [ -z "$viewer_cid" ]; then
-  fail "csp-report-viewer is not running or Docker is not accessible; start/check with docker compose --env-file docker-compose.env up -d csp-report-viewer hermes-gateway"
+  fail "offensive-research-portal is not running or Docker is not accessible; start/check with docker compose --env-file docker-compose.env up -d offensive-research-portal hermes-gateway"
 fi
 
 if [ -z "$gateway_cid" ]; then
-  fail "hermes-gateway is not running or Docker is not accessible; start/check with docker compose --env-file docker-compose.env up -d csp-report-viewer hermes-gateway"
+  fail "hermes-gateway is not running or Docker is not accessible; start/check with docker compose --env-file docker-compose.env up -d offensive-research-portal hermes-gateway"
 fi
 
-poll_enabled="$(docker exec "$gateway_cid" sh -lc 'printf %s "${CSP_AUDIT_TASK_POLL_ENABLED:-false}"' 2>/dev/null || true)"
-mode="$(docker exec "$gateway_cid" sh -lc 'printf %s "${CSP_AUDIT_TASK_EXECUTION_MODE:-receipt}"' 2>/dev/null || true)"
+poll_enabled="$(docker exec "$gateway_cid" sh -lc 'printf %s "${ORP_TASK_POLL_ENABLED:-false}"' 2>/dev/null || true)"
+mode="$(docker exec "$gateway_cid" sh -lc 'printf %s "${ORP_TASK_EXECUTION_MODE:-receipt}"' 2>/dev/null || true)"
 
 if [ "$poll_enabled" != "true" ]; then
-  fail "CSP_AUDIT_TASK_POLL_ENABLED is not true in hermes-gateway"
+  fail "ORP_TASK_POLL_ENABLED is not true in hermes-gateway"
 fi
 
 if [ "$mode" != "receipt" ]; then
-  fail "CSP_AUDIT_TASK_EXECUTION_MODE is '$mode', expected 'receipt' for this safe proof"
+  fail "ORP_TASK_EXECUTION_MODE is '$mode', expected 'receipt' for this safe proof"
 fi
 
 ok "Hermes gateway is configured for receipt-mode task polling"

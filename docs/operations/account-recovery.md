@@ -28,7 +28,7 @@ New-account setup checklist:
 
 ```text
 Create or link Vercel project under the new account
-Connect GitHub repo: xdkp/csp-audit
+Connect GitHub repo: xdkp/offensive-research-portal
 Set project root directory: report-viewer
 Use Next.js framework defaults
 Set production branch: main
@@ -65,7 +65,7 @@ Recreate/update:
 ```text
 SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY
-schema from csp-audit/supabase/schema.sql
+schema from offensive-research-portal/supabase/schema.sql
 ```
 
 Run schema before using the portal.

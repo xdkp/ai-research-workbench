@@ -27,10 +27,10 @@ This report summarizes the automated sync attempts (created `sync/auto-2026-05-2
   - Sync branch: `sync/auto-2026-05-20-055` pushed to `xdkp/hermes-agent`
   - PR created: https://github.com/xdkp/hermes-agent/pull/6
 
-- `csp-audit` (local path: `csp-audit`)
-  - Origin: `https://github.com/xdkp/csp-audit.git`
+- `offensive-research-portal` (local path: `offensive-research-portal`)
+  - Origin: `https://github.com/xdkp/offensive-research-portal.git`
   - Sync branch: `sync/auto-2026-05-20-060` pushed
-  - PR created: https://github.com/xdkp/csp-audit/pull/37
+  - PR created: https://github.com/xdkp/offensive-research-portal/pull/37
 
 - `cc-switch` (local path: `cc-switch`)
   - Origin: `https://github.com/xdkp/cc-switch-custom.git`
@@ -62,7 +62,7 @@ This report summarizes the automated sync attempts (created `sync/auto-2026-05-2
    - Keep the sync branches local and ask maintainers to pull from the `xdkp` repos I created (for `oh-my-claudecode` and `Fabric`) if you want to centralize.
 3. Review the created PRs and merge when ready:
    - `https://github.com/xdkp/hermes-agent/pull/6`
-   - `https://github.com/xdkp/csp-audit/pull/37`
+   - `https://github.com/xdkp/offensive-research-portal/pull/37`
 4. If you want, I can prepare a small script or CI job to automate future syncs and PR creation.
 
 ---

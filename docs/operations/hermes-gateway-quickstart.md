@@ -1,13 +1,13 @@
 # Hermes Gateway Quick Start
 
-This is the shortest local path for running the Docker Compose csp-audit + Hermes gateway slice. It keeps Vercel out of scope.
+This is the shortest local path for running the Docker Compose offensive-research-portal + Hermes gateway slice. It keeps Vercel out of scope.
 
 ## What This Starts
 
 ```text
-csp-report-viewer  -> local csp-audit UI/API at http://localhost:3000
+offensive-research-portal  -> local offensive-research-portal UI/API at http://localhost:3000
 csp-scan-worker    -> local scan polling worker
-hermes-gateway     -> Hermes gateway plus csp-audit heartbeat bridge
+hermes-gateway     -> Hermes gateway plus offensive-research-portal heartbeat bridge
 ```
 
 Task claiming is available but disabled by default so the gateway does not consume queued work by accident.
@@ -31,17 +31,17 @@ one Hermes provider key, such as OPENROUTER_API_KEY or GOOGLE_API_KEY
 
 Keep `docker-compose.env` local. It is ignored by git.
 
-## 2. Start csp-audit
+## 2. Start offensive-research-portal
 
 ```bash
-docker compose --env-file docker-compose.env --profile csp-audit up -d
-docker compose --env-file docker-compose.env --profile csp-audit ps
+docker compose --env-file docker-compose.env --profile offensive-research-portal up -d
+docker compose --env-file docker-compose.env --profile offensive-research-portal ps
 ```
 
 Expected:
 
 ```text
-csp-report-viewer   up, healthy
+offensive-research-portal   up, healthy
 csp-scan-worker     up
 ```
 
@@ -67,7 +67,7 @@ docker compose --env-file docker-compose.env --profile hermes-gateway logs --tai
 Expected heartbeat line:
 
 ```text
-csp-audit heartbeat ok: hermes-gateway
+offensive-research-portal heartbeat ok: hermes-gateway
 ```
 
 ## 4. Optional: Enable Task Bridge Receipt Mode
@@ -77,9 +77,9 @@ Receipt mode proves task claim, event posting, generated report submission, and 
 Edit `docker-compose.env`:
 
 ```text
-CSP_AUDIT_TASK_POLL_ENABLED=true
-CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS=60
-CSP_AUDIT_TASK_EXECUTION_MODE=receipt
+ORP_TASK_POLL_ENABLED=true
+ORP_TASK_POLL_INTERVAL_SECONDS=60
+ORP_TASK_EXECUTION_MODE=receipt
 ```
 
 Restart the gateway:
@@ -109,17 +109,17 @@ It reads credentials from the running containers and does not print secret value
 ## Stop
 
 ```bash
-docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway down
+docker compose --env-file docker-compose.env --profile offensive-research-portal --profile hermes-gateway down
 ```
 
 ## Rebuild After Code Changes
 
 ```bash
-docker compose --env-file docker-compose.env --profile csp-audit --profile hermes-gateway up -d --build csp-report-viewer hermes-gateway
+docker compose --env-file docker-compose.env --profile offensive-research-portal --profile hermes-gateway up -d --build offensive-research-portal hermes-gateway
 ```
 
 ## Next
 
-After receipt mode is proven, replace the receipt runner with a scoped Hermes execution adapter that performs approved work and sends evidence-backed candidate findings back to csp-audit.
+After receipt mode is proven, replace the receipt runner with a scoped Hermes execution adapter that performs approved work and sends evidence-backed candidate findings back to offensive-research-portal.
 
 See: [Hermes Gateway API Integration](../integrations/hermes-gateway-api-integration.md).

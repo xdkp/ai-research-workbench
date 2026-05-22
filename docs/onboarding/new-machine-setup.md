@@ -67,7 +67,7 @@ Expected repos:
 ```text
 Fabric
 cc-switch
-csp-audit
+offensive-research-portal
 hermes-agent
 oh-my-claudecode
 ```
@@ -79,7 +79,7 @@ Use each project’s own install docs. This workspace doc only defines the order
 1. `hermes-agent`
 2. `Fabric`
 3. `cc-switch`
-4. `csp-audit`
+4. `offensive-research-portal`
 5. `oh-my-claudecode`, if using Claude Code customization
 
 ## 5. Configure Minimum Secrets
@@ -90,7 +90,7 @@ Use the owner-specific config locations:
 
 - Hermes runtime secrets: Hermes config/env.
 - Provider/profile secrets for coding CLIs: cc-switch where supported.
-- Security workflow secrets: `csp-audit` env/Vercel/Supabase/GitHub settings.
+- Security workflow secrets: `offensive-research-portal` env/Vercel/Supabase/GitHub settings.
 - Local assistant config: `.codex`, `.agents`, or tool-specific user config.
 
 See:
@@ -113,10 +113,10 @@ The doctor is read-only. It reports missing tools and likely setup gaps.
 
 A good first workflow is local-only:
 
-1. Open `csp-audit`.
+1. Open `offensive-research-portal`.
 2. Run root tests.
 3. Build the report viewer.
 4. Open Hermes CLI/TUI separately.
-5. Use Fabric patterns manually for analysis/report text, but keep findings/evidence in `csp-audit`.
+5. Use Fabric patterns manually for analysis/report text, but keep findings/evidence in `offensive-research-portal`.
 
 Do not start with Vercel/Supabase/gateway unless the local stack is healthy.

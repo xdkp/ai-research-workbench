@@ -16,7 +16,7 @@ Source:
 ```text
 Fabric/
 cc-switch/
-csp-audit/
+offensive-research-portal/
 hermes-agent/
 oh-my-claudecode/
 docs/

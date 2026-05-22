@@ -1,6 +1,6 @@
 ---
 name: engagement-plan-from-scope
-description: Create a safe phased security engagement plan from csp-audit scope and rules of engagement.
+description: Create a safe phased security engagement plan from offensive-research-portal scope and rules of engagement.
 platforms: [linux, macos, windows]
 category: security
 metadata:
@@ -9,17 +9,17 @@ metadata:
       - pentest-ai-agents/.claude/agents/engagement-planner.md
       - pentest-ai-agents/.claude/agents/threat-modeler.md
     action_class: advisory
-    csp_audit_required: true
+    orp_required: true
     live_target_commands: false
 ---
 
 # Engagement Plan From Scope
 
-Use this skill to turn csp-audit engagement scope into an operator-reviewable workflow plan.
+Use this skill to turn offensive-research-portal engagement scope into an operator-reviewable workflow plan.
 
 ## Purpose
 
-Produce a structured plan that can become csp-audit tasks. This skill does not create findings, run commands, or bypass approval.
+Produce a structured plan that can become offensive-research-portal tasks. This skill does not create findings, run commands, or bypass approval.
 
 ## Required Inputs
 
@@ -37,7 +37,7 @@ Produce a structured plan that can become csp-audit tasks. This skill does not c
 3. Mark every active step with its required action class.
 4. Keep destructive, social engineering, C2, persistence, credential attacks, and denial-of-service steps out of the default plan.
 5. Prefer low-risk validation and evidence capture paths.
-6. Do not create tasks directly unless the calling workflow is explicitly authorized to call csp-audit task APIs.
+6. Do not create tasks directly unless the calling workflow is explicitly authorized to call offensive-research-portal task APIs.
 
 ## Output Format
 
@@ -62,6 +62,6 @@ Produce a structured plan that can become csp-audit tasks. This skill does not c
 1.
 ```
 
-## csp-audit Mapping
+## offensive-research-portal Mapping
 
-Each proposed task should map cleanly to a csp-audit `agent_tasks` record with explicit `target_url`, `requires_approval`, `approval_status`, and evidence expectations.
+Each proposed task should map cleanly to a offensive-research-portal `agent_tasks` record with explicit `target_url`, `requires_approval`, `approval_status`, and evidence expectations.

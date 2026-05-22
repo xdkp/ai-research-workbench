@@ -13,7 +13,7 @@ printf 'Root: %s\n\n' "$ROOT"
 
 if [ -d "$ROOT" ]; then ok "workspace root exists"; else fail "workspace root missing: $ROOT"; fi
 
-for dir in Fabric cc-switch csp-audit hermes-agent oh-my-claudecode .agents .codex; do
+for dir in Fabric cc-switch offensive-research-portal hermes-agent oh-my-claudecode .agents .codex; do
   if [ -d "$ROOT/$dir" ]; then
     ok "$dir exists"
   else
@@ -45,7 +45,7 @@ else
 fi
 
 printf '\nChild repo state\n'
-for repo in Fabric cc-switch csp-audit hermes-agent oh-my-claudecode; do
+for repo in Fabric cc-switch offensive-research-portal hermes-agent oh-my-claudecode; do
   if [ -d "$ROOT/$repo/.git" ]; then
     ok "$repo has its own Git repo"
   elif [ -d "$ROOT/$repo" ]; then

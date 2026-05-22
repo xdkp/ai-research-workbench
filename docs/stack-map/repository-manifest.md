@@ -28,7 +28,7 @@ The root `.gitignore` excludes child repos:
 ```text
 Fabric/
 cc-switch/
-csp-audit/
+offensive-research-portal/
 hermes-agent/
 oh-my-claudecode/
 ```
@@ -39,7 +39,7 @@ oh-my-claudecode/
 | --- | --- | --- | --- | --- |
 | `Fabric` | `main` | `6a9b55a0 chore(release): Update version to v1.4.452` | `https://github.com/danielmiessler/Fabric.git` | Clean |
 | `cc-switch` | `main` | `1af92d7b fix(clippy): resolve all 12 clippy 1.95 warnings to pass CI` | `https://github.com/xdkp/cc-switch-custom.git` | Clean |
-| `csp-audit` | `develop` | `2a1d7b3 Harden task controls and update Next security patch` | `https://github.com/xdkp/csp-audit.git` | Clean |
+| `offensive-research-portal` | `develop` | `2a1d7b3 Harden task controls and update Next security patch` | `https://github.com/xdkp/offensive-research-portal.git` | Clean |
 | `hermes-agent` | `main` | `ebf2ea584 feat(terminal,cli): docker_extra_args + display.timestamps` | `https://github.com/NousResearch/hermes-agent.git` | Clean |
 | `oh-my-claudecode` | `main` | `0ac52cda Merge main back into dev for release sync` | `https://github.com/Yeachan-Heo/oh-my-claudecode.git` | Clean |
 
@@ -71,7 +71,7 @@ Do not force the child repositories into the root repo.
 
 Planning archive: `docs/plans/README.md`.
 
-### `csp-audit`
+### `offensive-research-portal`
 
 This is the active product/control plane. Continue development here for:
 

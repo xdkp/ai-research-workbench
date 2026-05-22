@@ -63,7 +63,7 @@ printf 'Mode: read-only\n'
 print_repo "AI Research Workbench" "$ROOT"
 print_repo "Fabric" "$ROOT/Fabric"
 print_repo "cc-switch" "$ROOT/cc-switch"
-print_repo "csp-audit" "$ROOT/csp-audit"
+print_repo "offensive-research-portal" "$ROOT/offensive-research-portal"
 print_repo "hermes-agent" "$ROOT/hermes-agent"
 print_repo "oh-my-claudecode" "$ROOT/oh-my-claudecode"
 

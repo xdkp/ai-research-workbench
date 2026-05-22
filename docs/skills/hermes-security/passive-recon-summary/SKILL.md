@@ -9,13 +9,13 @@ metadata:
       - pentest-ai-agents/.claude/agents/osint-collector.md
       - pentest-ai-agents/.claude/agents/recon-advisor.md
     action_class: passive_recon
-    csp_audit_required: true
+    orp_required: true
     live_target_commands: false
 ---
 
 # Passive Recon Summary
 
-Use this skill to analyze passive source material already provided by the operator, csp-audit, or approved tooling output.
+Use this skill to analyze passive source material already provided by the operator, offensive-research-portal, or approved tooling output.
 
 ## Purpose
 
@@ -24,7 +24,7 @@ Create a concise recon summary and recommend safe next questions. This skill mus
 ## Allowed Inputs
 
 - User-provided URLs, screenshots, headers, scan outputs, crawl outputs, or notes.
-- csp-audit scan reports and route inventories.
+- offensive-research-portal scan reports and route inventories.
 - Public documentation text pasted into the task.
 - Passive OSINT notes already collected by approved tools.
 
@@ -33,7 +33,7 @@ Create a concise recon summary and recommend safe next questions. This skill mus
 1. Do not interact with live targets from this skill.
 2. Clearly label facts, evidence-backed observations, and hypotheses.
 3. Do not infer authorization beyond the provided scope.
-4. Recommend active checks only as candidate csp-audit tasks with the required action class.
+4. Recommend active checks only as candidate offensive-research-portal tasks with the required action class.
 5. Preserve uncertainty when evidence is incomplete.
 
 ## Output Format

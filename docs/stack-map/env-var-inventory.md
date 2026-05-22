@@ -21,22 +21,22 @@ This is the workspace-level index. Do not paste real secrets here.
 
 Ollama hosts local model files and inference. It does not own security tasks, evidence, approvals, findings, or reports.
 
-## csp-audit Local-Only
+## offensive-research-portal Local-Only
 
 | Variable | Owner | Required? | Notes |
 |---|---|---:|---|
-| none for root unit tests | csp-audit | no | `pnpm test` should run local tests |
-| `REPORT_VIEWER_BASE_URL` | csp-audit worker | only polling | Used by scan worker polling |
-| `SCAN_WORKER_TOKEN` | csp-audit worker | only worker API | Shared secret for worker routes |
+| none for root unit tests | offensive-research-portal | no | `pnpm test` should run local tests |
+| `REPORT_VIEWER_BASE_URL` | offensive-research-portal worker | only polling | Used by scan worker polling |
+| `SCAN_WORKER_TOKEN` | offensive-research-portal worker | only worker API | Shared secret for worker routes |
 
-## csp-audit Supabase / Vercel
+## offensive-research-portal Supabase / Vercel
 
 | Variable | Owner | Required? | Notes |
 |---|---|---:|---|
-| `SUPABASE_URL` | csp-audit | yes for hosted DB | Server-side only |
-| `SUPABASE_SERVICE_ROLE_KEY` | csp-audit | yes for hosted DB | Never expose to browser |
-| `SUPABASE_REQUEST_TIMEOUT_MS` | csp-audit | optional | Server-side Supabase request timeout; default `8000` so agent routes fail cleanly instead of hanging |
-| `AGENT_TOKEN` | csp-audit agent routes | yes for agent API | Shared secret for Hermes/agent routes |
+| `SUPABASE_URL` | offensive-research-portal | yes for hosted DB | Server-side only |
+| `SUPABASE_SERVICE_ROLE_KEY` | offensive-research-portal | yes for hosted DB | Never expose to browser |
+| `SUPABASE_REQUEST_TIMEOUT_MS` | offensive-research-portal | optional | Server-side Supabase request timeout; default `8000` so agent routes fail cleanly instead of hanging |
+| `AGENT_TOKEN` | offensive-research-portal agent routes | yes for agent API | Shared secret for Hermes/agent routes |
 | `VIEWER_BASIC_AUTH_USER` | report-viewer | recommended | Protects browser/API viewer |
 | `VIEWER_BASIC_AUTH_PASSWORD` | report-viewer | recommended | Must be paired with user |
 | `VIEWER_SESSION_SECRET` | report-viewer | optional | Session signing if configured |
@@ -52,13 +52,13 @@ Ollama hosts local model files and inference. It does not own security tasks, ev
 |---|---|---:|---|
 | Telegram/Discord/Slack/etc bot tokens | Hermes | only if gateway enabled | Rotate if bot account changes |
 | `HERMES_HOME` | Hermes | optional | Overrides the gateway runtime config root if you do not want the default `~/.hermes` |
-| `CSP_AUDIT_BASE_URL` | csp-audit | yes for agent heartbeat wiring | Used by Hermes gateway heartbeat bridge to reach `/api/agent/heartbeat` |
-| `CSP_AUDIT_AGENT_NAME` | Hermes | optional | Agent identity reported to csp-audit |
-| `CSP_AUDIT_AGENT_MODEL` | Hermes | optional | Model string reported to csp-audit |
-| `CSP_AUDIT_AGENT_PROFILE` | Hermes | optional | Profile string reported to csp-audit |
-| `CSP_AUDIT_TASK_POLL_ENABLED` | Hermes/csp-audit bridge | optional | Default `false`; set `true` only when the gateway should consume approved/not-required tasks |
-| `CSP_AUDIT_TASK_POLL_INTERVAL_SECONDS` | Hermes/csp-audit bridge | optional | Poll delay for task claiming loop |
-| `CSP_AUDIT_TASK_EXECUTION_MODE` | Hermes/csp-audit bridge | optional | Current supported value is `receipt`; proves API plumbing without target testing |
+| `ORP_BASE_URL` | offensive-research-portal | yes for agent heartbeat wiring | Used by Hermes gateway heartbeat bridge to reach `/api/agent/heartbeat` |
+| `ORP_AGENT_NAME` | Hermes | optional | Agent identity reported to offensive-research-portal |
+| `ORP_AGENT_MODEL` | Hermes | optional | Model string reported to offensive-research-portal |
+| `ORP_AGENT_PROFILE` | Hermes | optional | Profile string reported to offensive-research-portal |
+| `ORP_TASK_POLL_ENABLED` | Hermes/offensive-research-portal bridge | optional | Default `false`; set `true` only when the gateway should consume approved/not-required tasks |
+| `ORP_TASK_POLL_INTERVAL_SECONDS` | Hermes/offensive-research-portal bridge | optional | Poll delay for task claiming loop |
+| `ORP_TASK_EXECUTION_MODE` | Hermes/offensive-research-portal bridge | optional | Current supported value is `receipt`; proves API plumbing without target testing |
 
 ## cc-switch Provider Profiles
 

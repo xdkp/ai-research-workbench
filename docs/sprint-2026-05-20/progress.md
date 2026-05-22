@@ -6,7 +6,7 @@ Summary
 - Added `/api/findings/import-from-report` endpoint (requires `reviewed: true`).
 - Reports tab action: **Create Draft Finding** (consumes JSON draft reports).
 - Added handler tests (3) for the generated-report → draft-finding promotion path.
-- Merged foundation schema into `csp-audit/supabase/schema.sql`:
+- Merged foundation schema into `offensive-research-portal/supabase/schema.sql`:
   - `schema_version`, `audit_log`, `approval_policies`
   - `agent_tasks.action_class`, `agent_tasks.approval_reason`
   - finding `fingerprint`, fingerprint trigger/index
@@ -15,11 +15,11 @@ Summary
 
 Verification
 ------------
-- Typecheck: `pnpm --dir csp-audit/report-viewer exec tsc --noEmit`
-- Lint: `pnpm --dir csp-audit/report-viewer lint`
-- Tests (focused): `pnpm --dir csp-audit/report-viewer exec vitest run app/api/__tests__/findings-security.test.ts --reporter=verbose`
-- Full tests: `pnpm --dir csp-audit/report-viewer test -- --run` → 35 files, 207 tests
-- csp-audit package tests: `pnpm --dir csp-audit test`
+- Typecheck: `pnpm --dir offensive-research-portal/report-viewer exec tsc --noEmit`
+- Lint: `pnpm --dir offensive-research-portal/report-viewer lint`
+- Tests (focused): `pnpm --dir offensive-research-portal/report-viewer exec vitest run app/api/__tests__/findings-security.test.ts --reporter=verbose`
+- Full tests: `pnpm --dir offensive-research-portal/report-viewer test -- --run` → 35 files, 207 tests
+- offensive-research-portal package tests: `pnpm --dir offensive-research-portal test`
 - Git check: `git diff --check ...`
 
 Phase Status (code-checked)

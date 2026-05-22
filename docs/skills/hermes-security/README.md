@@ -14,7 +14,7 @@ They are not installed into upstream `hermes-agent` yet. Treat them as the sourc
 | Execution runtime | Hermes |
 | Provider/profile routing | cc-switch |
 | Local model runtime | Ollama, optional |
-| Scope, approval, evidence, findings, reports | csp-audit |
+| Scope, approval, evidence, findings, reports | offensive-research-portal |
 
 ## First Skill Slice
 
@@ -24,10 +24,10 @@ They are not installed into upstream `hermes-agent` yet. Treat them as the sourc
 | `engagement-plan-from-scope` | advisory | No | Turn engagement scope into a phased task plan. |
 | `passive-recon-summary` | passive_recon | No by default | Summarize passive source material and identify gaps. |
 | `finding-draft-from-evidence` | advisory | No | Draft finding content from stored evidence. |
-| `report-section-draft` | advisory | No | Draft report sections from approved csp-audit records. |
+| `report-section-draft` | advisory | No | Draft report sections from approved offensive-research-portal records. |
 
 ## Installation Rule
 
-Do not install or enable active testing skills until csp-audit has action-class gating tests and UI/API approval paths for active tasks.
+Do not install or enable active testing skills until offensive-research-portal has action-class gating tests and UI/API approval paths for active tasks.
 
 These specs intentionally avoid C2, phishing, payload crafting, credential testing, destructive testing, and privilege escalation workflows.
