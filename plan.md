@@ -764,30 +764,62 @@ luq = LongTextUQ(llm=llm,
 ## Current Build State
 
 ### cc-switch
-ProviderRouter + CircuitBreaker in Rust. Portal has `model-router.ts` — separate implementation. Skill manager UI not built. Runtime path with Hermes not verified.
+cc-switch is the intended owner of provider/model routing and skill management. The active Rust router lives in `cc-switch/src-tauri/src/proxy/providers/router.rs` and supports provider pools, circuit breakers, task complexity, capability tags, and local/cloud provider metadata. The current routing cleanup is being handled as a separate cc-switch change so it does not get mixed with root documentation/schema cleanup.
+
+Remaining ownership drift:
+
+- Portal still has a separate TypeScript model router at `offensive-research-portal/report-viewer/lib/model-router.ts`.
+- cc-switch now calls Portal `/api/models/route` through `src/lib/api/model-router-adapter.ts`; focused tests cover nested `{ name, model_identifier }` responses and legacy string responses.
+- Routing audit persistence is still unresolved: either write decisions to `model_routing_results` or retire that historical table.
+
+Target direction: cc-switch chooses models; Portal stores model configs, selections, usage, routing audit records, and dashboard views.
 
 ### Hermes
-Gateway heartbeat + task claim + receipt mode working. Analysis mode with Fabric enrichment, quarantine child-tasks, action classification, and browser validation in `offensive-research-portal-task-runner.py` (1100+ lines). Vuln intel adapter built (893 lines). UQLM Layer 2 verification adapter built (`uqlm_verify.py`, 300+ lines, 38 tests). Custom Fabric patterns not in Docker image. Fingerprint standardized.
+Gateway heartbeat, task claim, receipt mode, and the local task bridge are working. Analysis mode with Fabric enrichment, quarantine child-tasks, action classification, and browser validation lives in `offensive-research-portal-task-runner.py` (1117 lines). Vuln intel enrichment lives in `vuln_intel_adapter.py` (999 lines). UQLM Layer 2 verification lives in `uqlm_verify.py` (320 lines). Offline sync is implemented in `sync_worker.py` (366 lines). Fingerprint handling is standardized.
 
 ### Fabric
-CLI v1.4.452 installed. All 4 custom patterns on disk. Not verified with real findings. Not configured with model API. Patterns not in Docker image.
+Fabric CLI v1.4.452 is installed. Five custom patterns exist under `hermes-agent/fabric-patterns/` and are copied into the Hermes gateway image by `hermes-agent/Dockerfile.gateway`:
+
+- `csp_evaluation`
+- `enrich_finding`
+- `enrich_vuln_intel`
+- `pentest_finding_draft`
+- `pentest_report`
+
+Remaining proof: run the patterns against real finding material through Hermes/Fabric and record the result in Portal.
 
 ### UQLM
-Library cloned at `uqlm/` (v0.5.11, Apache 2.0). Adapter built (`uqlm_verify.py`) with BlackBoxUQ + LongTextUQ wrappers, field-level scorer configuration per engagement, and composite scoring. Layer 2 cooperative gate wired in enrichment-gate.ts with 8 test cases. Dependencies in Dockerfile.gateway, installed at boot via gateway-bootstrap.sh.
+Library cloned at `uqlm/` (v0.5.11, Apache 2.0). Adapter built (`uqlm_verify.py`) with BlackBoxUQ + LongTextUQ wrappers, field-level scorer configuration per engagement, and composite scoring. Layer 2 cooperative gate is wired in `enrichment-gate.ts`. Dependencies are installed through `Dockerfile.gateway` and the mounted `uqlm/` checkout is installed at boot through `gateway-bootstrap.sh`.
 
 ### Portal
-All 8 targeted routes hardened. Hallucination gate Layer 1 active (18 tests). `createSecureApiHandler` passes route context for dynamic routes. Triage detail panel and evidence workflow not complete.
+Portal is the read/write API boundary for Supabase and the read dashboard for operator review. It should not own final model-selection policy. Current model APIs exist for config, selection, usage, summary, and a temporary route endpoint, but the cc-switch <-> Portal API contract needs cleanup before model routing is considered production-wired.
+
+Known drift to fix next:
+
+- Retire or demote Portal-side routing logic in `report-viewer/lib/model-router.ts`.
+- Decide whether `/api/models/route` stays as the Portal boundary or becomes a thinner storage/observability endpoint after cc-switch fully owns selection policy.
+- Persist routing decisions to `model_routing_results` or remove that table if it remains unused.
 
 ### Supabase
-18 tables, RLS deny-all, service_role bypass. Foundation schema merged into canonical. `model_pool` removed. Fingerprint unified across all systems. Live Supabase needs verification.
+`offensive-research-portal/supabase/schema.sql` is the canonical schema source. It currently defines 19 tables with RLS deny-all plus service-role server access. `offensive-research-portal/supabase/model-tables.sql` is a historical Phase 5 extraction and must not be used as the canonical schema because it duplicates a subset of `schema.sql` and lacks the safe migration logic now present there.
+
+Canonical model-related names:
+
+| Name | Meaning |
+|---|---|
+| `skill_tag` | Workflow/Hermes skill identifier. Prefer this over new ad hoc `task_type` routing inputs. |
+| `task_type` | Legacy route compatibility field. Map it from `skill_tag` until Portal route/schema naming is consolidated. |
+| `model_identifier` | Provider model ID, for example an Ollama/OpenRouter/Gemini model string. |
+| `selected_model` | Model chosen for a workflow step or agent task. |
+| `routed_model` | Routing audit output only; should be written to `model_routing_results` if that table stays. |
 
 ### Vuln Intel Pipeline
-Schema built (17 tables, v3). `enrich_vuln_intel` Fabric pattern created (139 lines). Hermes vuln intel adapter built (893 lines, `hermes-agent/scripts/vuln_intel_adapter.py`): NVD via CPE/keyword search, CISA KEV full-catalog check, EPSS single + batch lookup, OSV package/version query, Playwright fallback for vendor HTML, SQLite cache read/write, rate limiter per source, circuit breaker (3 failures → 5min open), retry with exponential backoff + Retry-After header respect. Sync worker not created.
+Schema and adapters are built. `enrich_vuln_intel` exists as a Fabric pattern. `vuln_intel_adapter.py` supports NVD, CISA KEV, EPSS, OSV, retry, source-specific rate limiting, circuit breaking, Playwright fallback for vendor HTML, SQLite cache read/write, and mirror mode for KEV plus recent NVD keyword fetches.
 
 ### Safety & Resilience
-Layer 1 + Layer 2 (UQLM) hallucination gates built. UQLM scores written to audit_log. Idempotency built. Crash recovery: schema built (checkpoint table), worker not built. Offline buffer: schema built (sync_queue table), sync worker not built.
+Layer 1 + Layer 2 hallucination gates are built. UQLM scores are written to `audit_log`. Idempotency is built. Crash recovery schema and local sync queue exist, and `sync_worker.py` is present. Remaining proof is operational: run the full offline-buffer drain and Supabase reconciliation path under a controlled test.
 
-Detailed phase tracking: `offensive-research-portal/plan.md` (Phase 0–12)
+Detailed phase tracking: `offensive-research-portal/plan.md` (Phase 0-12)
 
 ---
 
@@ -805,7 +837,7 @@ Detailed phase tracking: `offensive-research-portal/plan.md` (Phase 0–12)
 - [x] cc-switch ↔ Hermes + Fabric runtime wiring (Dockerfile, Fabric patterns, report mode, task polling)
 - [x] Portal cleaned to read-only dashboard (setup wizard removed, model config moved to cc-switch)
 - [x] Operator triage with quarantine gates
-- [x] cc-switch → Supabase model sync (model configs, selections, usage)
+- [ ] cc-switch → Supabase model sync contract — config, selection, and usage endpoints exist; route adapter is aligned, but routing audit writes remain pending
 
 ### Release B — UQLM Integration
 - [x] `uqlm_verify.py` adapter module
@@ -815,10 +847,11 @@ Detailed phase tracking: `offensive-research-portal/plan.md` (Phase 0–12)
 - [x] UQLM confidence in audit_log
 
 ### Release C — Advanced Automation
-- [x] Dynamic model routing with cc-switch — 5 strategies, quality-aware tier selection
-- [x] Token-optimized quality routing — simple tasks→cheap models, complex→powerful, circuit breaker
-- [x] Skill manager UI — 5 Hermes skills, action class badges, Skills tab
-- [x] Full observability dashboard — ModelDashboard, 4 charts, 30s polling
+- [x] cc-switch routing foundation — provider pools, circuit breakers, strategy parsing, quality-aware tier selection
+- [ ] Reconcile model routing ownership — cc-switch is the chooser, Portal is storage/observability
+- [x] Align cc-switch model router adapter with Portal `/api/models/route` and normalize response shapes
+- [x] Skill manager foundation — cc-switch Skills UI exists; Portal Skills tab remains informational
+- [x] Model observability dashboard — ModelDashboard with usage polling
 - [x] Tuned UQLM ensemble with ground-truth calibration — uqlm_calibrate.py + calibration weights
 - [x] Vuln intel data source caching + local mirror — mirror mode (KEV + NVD pre-fetch)
 
