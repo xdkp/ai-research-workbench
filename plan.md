@@ -815,11 +815,12 @@ Detailed phase tracking: `offensive-research-portal/plan.md` (Phase 0–12)
 - [x] UQLM confidence in audit_log
 
 ### Release C — Advanced Automation
-- [ ] Dynamic model routing with cc-switch
-- [ ] Skill manager UI
-- [ ] Full observability dashboard (Portal reads model usage/cost from Supabase)
-- [ ] Tuned UQLM ensemble with ground-truth calibration
-- [ ] Vuln intel data source caching + local mirror
+- [x] Dynamic model routing with cc-switch — 5 strategies, quality-aware tier selection
+- [x] Token-optimized quality routing — simple tasks→cheap models, complex→powerful, circuit breaker
+- [x] Skill manager UI — 5 Hermes skills, action class badges, Skills tab
+- [x] Full observability dashboard — ModelDashboard, 4 charts, 30s polling
+- [x] Tuned UQLM ensemble with ground-truth calibration — uqlm_calibrate.py + calibration weights
+- [x] Vuln intel data source caching + local mirror — mirror mode (KEV + NVD pre-fetch)
 
 ---
 
