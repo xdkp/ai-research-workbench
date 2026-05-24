@@ -59,6 +59,12 @@ Ollama hosts local model files and inference. It does not own security tasks, ev
 | `ORP_TASK_POLL_ENABLED` | Hermes/offensive-research-portal bridge | optional | Default `false`; set `true` only when the gateway should consume approved/not-required tasks |
 | `ORP_TASK_POLL_INTERVAL_SECONDS` | Hermes/offensive-research-portal bridge | optional | Poll delay for task claiming loop |
 | `ORP_TASK_EXECUTION_MODE` | Hermes/offensive-research-portal bridge | optional | Current supported value is `receipt`; proves API plumbing without target testing |
+| `ORP_MODEL_ROUTING_ENABLED` | Hermes/cc-switch bridge | optional | Default `true`; Hermes asks cc-switch for model selection when the local router is reachable |
+| `CC_SWITCH_MODEL_ROUTER_URL` | Hermes/cc-switch bridge | optional | Default `http://host.docker.internal:15721/cc-switch/models/route` in Docker Compose |
+| `CC_SWITCH_MODEL_ROUTER_APP` | Hermes/cc-switch bridge | optional | cc-switch app/profile namespace, default `gemini` |
+| `SYNC_WORKER_ENABLED` | Hermes/offensive-research-portal bridge | optional | Default `false`; enable only after the local sync queue schema exists |
+| `HERMES_GATEWAY_INSTALL_BROWSER_TOOLS` | Hermes Docker build/runtime | optional | Default `false`; opt in for Playwright/browser-validation images |
+| `HERMES_GATEWAY_INSTALL_UQLM_DEPS` | Hermes Docker build/runtime | optional | Default `false`; opt in for UQLM validation images; may install heavy ML dependencies |
 
 ## cc-switch Provider Profiles
 

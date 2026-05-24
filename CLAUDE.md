@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 At the start of every session, Claude MUST:
 
-1. **Load memory.** Read `/mnt/develop/AI_Research/memory/MEMORY.md` and all files it links to (user profile, current work, feedback, references). Do not skip this — the user's machine freezes and sessions can end abruptly. Memory is the only continuity between sessions.
+1. **Load memory.** Read `/home/m0bious/.claude/projects/-mnt-develop-AI-Research/memory/MEMORY.md` and all files it links to (user profile, current work, feedback, references). Do not skip this — the user's machine freezes and sessions can end abruptly. Memory is the only continuity between sessions.
 
 2. **Load oh-my-claudecode.** List agents at `oh-my-claudecode/agents/` and skills at `oh-my-claudecode/skills/`. These are the development toolchain — 19 specialist agents (planner, code-reviewer, git-master, qa-tester, verifier, etc.) and skills (autopilot, debug, etc.). Use them instead of working directly whenever appropriate.
 

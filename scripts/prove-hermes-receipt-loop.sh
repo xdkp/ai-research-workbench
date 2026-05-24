@@ -13,7 +13,7 @@ fail() { printf 'FAIL  %s\n' "$1"; exit 1; }
 info() { printf 'INFO  %s\n' "$1"; }
 
 compose() {
-  docker compose --env-file "$ENV_FILE" "$@"
+  docker compose -f "$ROOT/docker-compose.yml" --env-file "$ENV_FILE" "$@"
 }
 
 if [ ! -d "$ROOT" ]; then

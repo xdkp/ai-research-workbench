@@ -40,7 +40,8 @@ hermes-gateway container
 | Task claiming | Implemented, opt-in, proved | Disabled unless `ORP_TASK_POLL_ENABLED=true` |
 | Event posting | Implemented, opt-in, proved | Runner posts `started`, `checkpoint`, and `completed` events |
 | Result submission | Implemented, opt-in, proved | Runner submits a markdown receipt report |
-| Receipt proof | Proved 2026-05-19 | Tasks `6d409002-89ea-490e-8135-a69302f4410e` and `8870f2ae-7b1c-464a-9100-b3a538ed6d84` completed with four persisted events and generated reports |
+| Receipt proof | Proved 2026-05-23 | Task `5261ad04-6014-4453-8ff2-d8c736ffeca4` completed with four persisted events and a generated receipt report |
+| Model-route proof | Proved 2026-05-24 | Headless cc-switch router was reachable from `hermes-gateway`; Hermes logged the selected model through Portal and Supabase persisted `model_selections` plus `model_routing_results` rows |
 | Real security execution | Not proved | Receipt mode performs no target interaction, scanning, or exploitation |
 
 ## Required Environment
@@ -57,6 +58,12 @@ Set these in `docker-compose.env` before starting Compose. Do not commit that fi
 | `ORP_TASK_POLL_ENABLED` | optional | Must be `true` before the gateway consumes tasks |
 | `ORP_TASK_POLL_INTERVAL_SECONDS` | optional | Poll delay, default `60` |
 | `ORP_TASK_EXECUTION_MODE` | optional | Current supported value: `receipt` |
+| `ORP_MODEL_ROUTING_ENABLED` | optional | Default `true`; routes model selection through cc-switch before execution when the router is running |
+| `CC_SWITCH_MODEL_ROUTER_URL` | optional | Local cc-switch route endpoint reachable from the container |
+| `CC_SWITCH_MODEL_ROUTER_APP` | optional | cc-switch app/profile namespace for provider lookup |
+| `SYNC_WORKER_ENABLED` | optional | Default `false`; enable only after local sync queue schema is initialized |
+| `HERMES_GATEWAY_INSTALL_BROWSER_TOOLS` | optional build/runtime flag | Default `false`; enable only for browser-validation images |
+| `HERMES_GATEWAY_INSTALL_UQLM_DEPS` | optional build/runtime flag | Default `false`; enable only for UQLM validation images; may install heavy ML dependencies |
 
 ## Safety Model
 
@@ -98,7 +105,13 @@ Use a harmless public documentation target for the bridge proof. Do not use this
 ./scripts/prove-hermes-receipt-loop.sh
 ```
 
-The script creates a claimable task with `requires_approval=false`, restarts `hermes-gateway` so it polls immediately, and verifies task status, events, and generated report persistence.
+Run the model-route proof after the cc-switch GUI proxy or headless model router is listening on port `15721`:
+
+```bash
+./scripts/prove-hermes-model-route-loop.sh
+```
+
+The scripts create a claimable task with `requires_approval=false`, restarts `hermes-gateway` so it polls immediately, and verifies task status, events, and generated report persistence.
 
 ## Verify
 

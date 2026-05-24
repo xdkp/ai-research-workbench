@@ -55,22 +55,30 @@ services:
     build:
       context: ./hermes-agent
       dockerfile: Dockerfile.gateway
+      args:
+        HERMES_GATEWAY_INSTALL_BROWSER_TOOLS: ${HERMES_GATEWAY_INSTALL_BROWSER_TOOLS:-false}
+        HERMES_GATEWAY_INSTALL_UQLM_DEPS: ${HERMES_GATEWAY_INSTALL_UQLM_DEPS:-false}
     image: ai-research-workbench/hermes-gateway:local
     depends_on:
       offensive-research-portal:
         condition: service_healthy
     environment:
       HERMES_HOME: /data/hermes
+      HERMES_GATEWAY_INSTALL_BROWSER_TOOLS: ${HERMES_GATEWAY_INSTALL_BROWSER_TOOLS:-false}
+      HERMES_GATEWAY_INSTALL_UQLM_DEPS: ${HERMES_GATEWAY_INSTALL_UQLM_DEPS:-false}
       AGENT_TOKEN: ${AGENT_TOKEN:-replace-me}
       ORP_BASE_URL: http://offensive-research-portal:3000
       ORP_AGENT_NAME: ${ORP_AGENT_NAME:-hermes-gateway}
       ORP_AGENT_MODEL: ${ORP_AGENT_MODEL:-hermes-gateway}
       ORP_AGENT_PROFILE: ${ORP_AGENT_PROFILE:-default}
       ORP_HEARTBEAT_INTERVAL_SECONDS: ${ORP_HEARTBEAT_INTERVAL_SECONDS:-30}
-      ORP_TASK_POLL_ENABLED: ${ORP_TASK_POLL_ENABLED:-true}
-      ORP_TASK_POLL_INTERVAL_SECONDS: ${ORP_TASK_POLL_INTERVAL_SECONDS:-30}
-      ORP_TASK_EXECUTION_MODE: ${ORP_TASK_EXECUTION_MODE:-analysis}
-      SYNC_WORKER_ENABLED: ${SYNC_WORKER_ENABLED:-true}
+      ORP_TASK_POLL_ENABLED: ${ORP_TASK_POLL_ENABLED:-false}
+      ORP_TASK_POLL_INTERVAL_SECONDS: ${ORP_TASK_POLL_INTERVAL_SECONDS:-60}
+      ORP_TASK_EXECUTION_MODE: ${ORP_TASK_EXECUTION_MODE:-receipt}
+      ORP_MODEL_ROUTING_ENABLED: ${ORP_MODEL_ROUTING_ENABLED:-true}
+      CC_SWITCH_MODEL_ROUTER_URL: ${CC_SWITCH_MODEL_ROUTER_URL:-http://host.docker.internal:15721/cc-switch/models/route}
+      CC_SWITCH_MODEL_ROUTER_APP: ${CC_SWITCH_MODEL_ROUTER_APP:-gemini}
+      SYNC_WORKER_ENABLED: ${SYNC_WORKER_ENABLED:-false}
       PENTEST_DB_PATH: ${PENTEST_DB_PATH:-/data/hermes/findings.db}
       OLLAMA_API_KEY: ${OLLAMA_API_KEY:-}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}

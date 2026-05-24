@@ -27,6 +27,12 @@ Optional task bridge values:
 | `ORP_TASK_POLL_ENABLED` | `false` | Set `true` only when the gateway should consume tasks |
 | `ORP_TASK_POLL_INTERVAL_SECONDS` | `60` | Task claim poll interval |
 | `ORP_TASK_EXECUTION_MODE` | `receipt` | Current safe proof mode; performs no target testing |
+| `ORP_MODEL_ROUTING_ENABLED` | `true` | Set `false` only when intentionally bypassing cc-switch routing |
+| `CC_SWITCH_MODEL_ROUTER_URL` | `http://host.docker.internal:15721/cc-switch/models/route` | Hermes container endpoint for local cc-switch model decisions |
+| `CC_SWITCH_MODEL_ROUTER_APP` | `gemini` | cc-switch app/profile namespace used for routing provider lookup |
+| `SYNC_WORKER_ENABLED` | `false` | Enable only after local sync queue schema exists |
+| `HERMES_GATEWAY_INSTALL_BROWSER_TOOLS` | `false` | Build/runtime opt-in for Playwright browser tooling |
+| `HERMES_GATEWAY_INSTALL_UQLM_DEPS` | `false` | Build/runtime opt-in for UQLM ML dependencies; can be heavy |
 
 ## Seeding Behavior
 
