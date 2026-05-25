@@ -1658,10 +1658,12 @@ Regression scenario:
   - Hermes now includes optional `data_sensitivity` and `validation_action_risk` fields when asking cc-switch for a model route. cc-switch enforces the sensitivity boundary before provider selection.
 - [x] Enforce `raw_local_only` in cc-switch so cloud providers cannot receive raw sensitive payloads
   - Implemented in the shared Rust router and exercised through the headless router tests.
-- [ ] Add local rehydration in cc-switch or CLI for operator-only manual review/testing
-  - Core helper exists in Hermes; user-facing operator view is not wired yet.
-- [ ] Add UQLM tests for redacted reproduction templates
-- [ ] Prove high-impact finding flow: raw local evidence -> redacted cloud reasoning -> UQLM score -> operator review -> local rehydrated safe test
+- [x] Add local rehydration in cc-switch or CLI for operator-only manual review/testing
+  - `scripts/rehydrate.py` supports `--registry-path` and `--engagement-id` for operator review. Core helper exists in Hermes `LocalRedactionRegistry.rehydrate()`. Tests in `tests/test_rehydrate_cli.py`.
+- [x] Add UQLM tests for redacted reproduction templates
+  - `tests/test_uqlm_redacted_verification.py`: 3 tests proving `_build_short_prompts` and `_build_long_prompts` emit `[REF]` markers, not raw values, and that composite scoring is unaffected.
+- [x] Prove high-impact finding flow: raw local evidence -> redacted cloud reasoning -> UQLM score -> operator review -> local rehydrated safe test
+  - `tests/test_task_runner_proof_policy.py::test_high_impact_finding_full_flow_with_uqlm_and_rehydration` exercises full pipeline. Also fixed a double-redaction bug in `register_value()` where existing placeholders were re-registered as new secrets.
 
 ### Release E — Proof-Driven Automation
 - [x] Add canonical enum definitions in Python/Rust/TypeScript/SQL for `data_sensitivity`, `validation_action_risk`, `proof_ladder_rung`, `operator_decision`, and `promotion_state`
