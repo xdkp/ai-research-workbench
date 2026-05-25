@@ -2,7 +2,50 @@
 
 A pentest workbench where **one command bootstraps the full stack** with guided onboarding. **The operator is the decision maker. AI is the research assistant.**
 
-**Last audited:** 2026-05-24 against `cc-switch`, `offensive-research-portal`, `hermes-agent`, root docs, and the current feature branches for local-first model routing, UQLM verification, and the sensitive-evidence boundary described below.
+**Last audited:** 2026-05-25 against `cc-switch`, `offensive-research-portal`, `hermes-agent`, root docs, and the current feature branches for local-first model routing, UQLM verification, and the sensitive-evidence boundary described below.
+
+## North Star Operating Model
+
+This workbench is **not** a local-model-only system. The intended design is cloud-assisted, privacy-preserving pentest reasoning:
+
+```text
+local machine = raw evidence, scope, secrets, execution, rehydration, operator workflow
+cloud models = heavy reasoning, large context, methodology synthesis, proof-card drafting
+```
+
+Local-first means **local authority and local sensitive-data custody**, not forcing a weak local model to solve tasks it cannot handle. When local capability is insufficient, Hermes must redact first, retrieve relevant methodology/context, then route a cloud-safe reasoning request to an approved cloud strategist model.
+
+The core loop is:
+
+```text
+raw local evidence
+  -> LocalRedactionRegistry
+  -> RedactedFindingBrief with useful semantics preserved
+  -> RAG/context pack: methodology, standards, public vuln intel, prior redacted proof patterns
+  -> cloud or local strategist drafts a parameterized validation card
+  -> UQLM checks grounding/consistency against the brief
+  -> Hermes rehydrates locally, scope-checks, and applies proof-ladder gates
+  -> operator reviews or approves where policy requires it
+```
+
+Cloud models may be DeepSeek, OpenAI, Anthropic, OpenRouter, or another approved provider. The model name is not the policy. The policy is what the model is allowed to see and what it is allowed to decide.
+
+Cloud models may see:
+
+- `RedactedFindingBrief/v1` with stable refs such as `[IP_REF_1]` and `[SECRET_REF_1]`
+- public CVE/CWE/KEV/EPSS/vendor/OWASP context
+- retrieved methodology and safe proof patterns
+- service metadata and sanitized request shape
+- action constraints, stop conditions, and proof-ladder policy
+
+Cloud models must not see by default:
+
+- raw private IPs/domains/internal URLs
+- raw credentials, tokens, cookies, customer data, screenshots, or request/response bodies
+- unredacted exploit material tied to a live target
+- authority to execute, approve, or escalate a proof step
+
+This is the solution this project is aiming for: **use the largest useful brain available, but keep the real target and execution authority local.**
 
 ---
 
@@ -10,11 +53,11 @@ A pentest workbench where **one command bootstraps the full stack** with guided 
 
 ### cc-switch — Central Management Platform
 
-Your command center. Everything goes through cc-switch. Runs local (Tauri/Rust), no internet required for operation.
+Your command center. Everything goes through cc-switch. Runs local (Tauri/Rust), no internet required for operation. It owns model policy: local models, cloud strategists, UQLM judges, and report writers are all selected through capability records and sensitivity gates.
 
 - Workflow management — create, edit, approve execution plans before anything runs
 - Skill management — browse, add, configure pentest skills, enable/disable
-- Model routing — selects the best allowed model per task from your pool based on policy, measured capability records, sensitivity, and runtime health; delegates on failure, alerts on limits, circuit-breaks unhealthy providers
+- Model routing — selects the best allowed model per task from your pool based on policy, measured capability records, sensitivity, runtime health, cost, and context needs; delegates on failure, alerts on limits, circuit-breaks unhealthy providers
 
 ### Hermes — Offensive Team
 
@@ -176,13 +219,14 @@ The registry is not uploaded to Portal or Supabase. Portal stores the redacted f
 
 #### Cloud model role
 
-Cloud models may be used for reasoning quality, but only against a redacted brief. They produce:
+Cloud models are first-class heavy-reasoning assistants when local models are not capable enough or the task needs large context. They may be used for strategy, synthesis, and proof-card drafting, but only against redacted and public/contextual inputs. They produce:
 
 - likely vulnerability class and reasoning
 - test strategy
 - low-noise reproduction template
 - evidence checklist
 - questions for the local model or operator
+- confidence gaps and missing evidence requests
 
 Cloud models must not produce final raw commands containing real targets because they do not know the real target values. They can produce parameterized instructions using references:
 
@@ -190,6 +234,24 @@ Cloud models must not produce final raw commands containing real targets because
 Check whether [DOMAIN_REF_1] exposes an unauthenticated admin route.
 Have the local executor resolve [DOMAIN_REF_1] and perform a safe HEAD/GET probe only.
 ```
+
+Cloud model prompts must preserve enough semantics to reason well. Redaction must not collapse the finding into meaningless placeholders.
+
+Bad cloud prompt:
+
+```text
+[THING_REF_1] is vulnerable on [DOMAIN_REF_1]. What next?
+```
+
+Good cloud prompt:
+
+```text
+A private internal admin web panel at [URL_REF_1] returned HTTP 200 to an unauthenticated HEAD request.
+Observed headers are redacted but indicate missing frame protections. No response body is included.
+Goal: propose the lowest-risk validation card. Do not request state change, data access, high-load timing, or DoS.
+```
+
+Approved cloud strategist examples include cheap long-context models such as DeepSeek when their provider policy, cost ceiling, and capability records allow them. Provider choice is an implementation detail; the invariant is redacted evidence in, parameterized proof plan out.
 
 #### Local model and local executor role
 
@@ -212,10 +274,10 @@ Every model-routing request must include a sensitivity classification:
 | `data_sensitivity` | Router behavior |
 |---|---|
 | `raw_local_only` | cc-switch may select only local providers. If no capable local provider exists, route to operator review or request redaction first. |
-| `redacted_cloud_ok` | cc-switch prefers capable local providers, then may fall back to cloud providers based on skill, tags, quality floor, and circuit state. |
+| `redacted_cloud_ok` | cc-switch may select the best capable local or cloud strategist based on skill, tags, measured capability, context requirement, cost ceiling, and circuit state. Cloud routing is allowed and expected when the task needs heavier reasoning than local models can provide. |
 | `public` | cc-switch may choose any capable provider based on strategy and cost/quality policy. |
 
-Local-first means "local if capable and allowed." It does not mean "use a weak local model for tasks it cannot reason about." If local capability is insufficient, Hermes must build a `RedactedFindingBrief` before asking a cloud model.
+Local-first means "local control, local raw data, local execution." It does not mean "use a weak local model for tasks it cannot reason about." If local capability is insufficient, Hermes must build a `RedactedFindingBrief` and context pack before asking a cloud model.
 
 #### Portal storage invariant
 
@@ -339,6 +401,47 @@ Human review is best used where it changes stability:
 | State-changing/destructive/data-access proof | Preserves operator authority and engagement rules. |
 
 This is the safe interpretation of a self-improving Hermes: it improves from operator-reviewed outcomes and measured capability records. It must not rewrite policy, promote models, or authorize higher-risk actions by itself.
+
+### RAG / Context Engineering Evaluation
+
+RAG in this project is not only document Q&A. It is the way Hermes gives a cloud or local strategist enough context to think without exposing raw targets.
+
+The retrieval corpus should include:
+
+- approved methodology from `pentest-ai-agents`
+- OWASP WSTG/ASVS, CWE, CVE/NVD, KEV, EPSS, vendor advisories, and internal notes that are safe to use
+- prior redacted validation cards and operator outcomes
+- safe proof patterns, stop-condition examples, and false-positive examples
+
+The RAG output should be a compact context pack attached to the `RedactedFindingBrief`:
+
+```text
+RedactedFindingBrief/v1
+  + retrieved methodology snippets
+  + relevant standards and public vuln intel
+  + prior redacted proof cards with outcomes
+  + proof-ladder and stop-condition policy
+  -> strategist model drafts validation card
+```
+
+RapidFire-style evaluation is useful here, but it has a different job than UQLM:
+
+| Layer | Question answered | Output |
+|---|---|---|
+| RAG/golden evaluation | Which retrieval/model/prompt setup works best across known cases? | Capability records and approved defaults. |
+| UQLM | Is this specific generated proof card grounded and noncontradictory? | Accept/refine/review signal. |
+| Operator feedback | Was this actually useful and safe in the engagement? | Final truth signal for capability records. |
+
+Start small to avoid melting the laptop:
+
+- 20-30 golden cases first, not a huge grid.
+- 2 retrieval configs, 2 strategist models, 1 generation each.
+- Run cloud strategist models such as DeepSeek only on redacted briefs and public/context packs.
+- Cache common prompt prefixes and retrieved context where the provider supports it.
+- Enforce per-run token, dollar, concurrency, and timeout budgets.
+- Store only aggregate results and redacted examples in `model_capability_records`.
+
+The evaluation harness may use RapidFire, a lightweight in-repo runner, or both. The invariant is the same: public benchmarks are priors; workspace golden cases and operator feedback decide trust.
 
 ### Storage and Portal View Contract
 
@@ -876,11 +979,13 @@ async def verify_enrichment(
 ```
 
 ### Model routing
-Task assigned → Hermes classifies data sensitivity → cc-switch matches skill tag, required capability tags, quality floor, and sensitivity policy → routes to best allowed provider → circuit-breaks on failure → delegates to next allowed provider → alerts operator on limits.
+Task assigned → Hermes classifies data sensitivity and context need → cc-switch matches skill tag, provider profile, required capability tags, quality floor, cost ceiling, and sensitivity policy → routes to the best allowed provider → circuit-breaks on failure → delegates to next allowed provider → alerts operator on limits.
 
 If the task contains raw sensitive evidence, cc-switch may only return a local provider. If no local provider is capable enough, Hermes must redact first or stop for operator review. Cloud fallback is allowed only after the payload is transformed into a `RedactedFindingBrief`.
 
-Routing is also capability-gated. A provider tag such as `analysis`, `exploit`, or `report` is only a claim until that model has an approved capability record for the skill. Public benchmarks may influence candidate selection, but runtime routing uses local capability records, sensitivity policy, and action-risk policy.
+For `redacted_cloud_ok` and `public` tasks, cloud routing is not a failure mode; it is the intended path when a model has better measured capability, larger useful context, or better cost/latency for that skill. Cheap long-context models such as DeepSeek can be cloud strategist candidates, but they start as `candidate`/`shadow` until measured on workspace golden tasks.
+
+Routing is also capability-gated. A provider tag such as `analysis`, `exploit`, or `report` is only a claim until that model has an approved capability record for the skill. Public benchmarks may influence candidate selection, but runtime routing uses local capability records, sensitivity policy, action-risk policy, and spend limits.
 
 ### Report generation
 Operator clicks "Generate Report" → Portal creates task → Hermes claims → Fabric writes report → Hermes POSTs to Supabase → Portal shows download.
@@ -1678,8 +1783,11 @@ Regression scenario:
 - [ ] Add proof-card UI in cc-switch/Portal for quick operator review
 - [ ] Add Portal proof queue, approval queue, finding-detail proof panel, model capability dashboard, and audit timeline
 - [ ] Add model capability records per `model_identifier` + `skill_tag` + `data_sensitivity`
+- [ ] Add cloud-strategist provider profiles for cheap long-context models such as DeepSeek, with redacted-only input policy, token/cost ceilings, and no execution authority
+- [ ] Add RAG/context-pack builder for `RedactedFindingBrief` using methodology, public vuln intel, prior redacted proof cards, proof-ladder rules, and stop conditions
 - [ ] Add shadow-mode evaluation for candidate models
 - [ ] Add golden test set for core skills: recon summary, finding enrichment, exploit validation planning, report drafting, UQLM review
+- [ ] Add RapidFire-compatible or lightweight context-engineering evaluation harness for redacted briefs so retrieval/model/prompt configs can be measured before promotion
 - [ ] Add feedback loop from operator decisions into model capability records
 - [x] Prove safe validation flow: high-impact hypothesis -> low-risk proof card -> operator-visible evidence -> no destructive action
   - `hermes-agent/tests/test_task_runner_proof_policy.py::test_high_impact_finding_full_flow_with_uqlm_and_rehydration` now proves a critical finding is reduced to a redacted cloud brief, UQLM reviews only redacted/parameterized evidence, Hermes emits an `active_read_only` proof card at proof rung 1, no quarantine/destructive task is created, and the local redaction registry rehydrates the finding for operator review.
@@ -1704,6 +1812,9 @@ Regression scenario:
 | R11 | Agent self-improvement mutates policy or model trust without review | Feedback may update scores only; policy/model promotion requires operator-reviewed change |
 | R12 | Local DB, Supabase, and Portal use different parameter names | Canonical enum contract, compatibility migration, schema/API tests across Python/Rust/TypeScript/SQL |
 | R13 | Local PostgreSQL added later with a divergent schema | Treat `schema.sql` as canonical; local Postgres/Supabase-dev must run the same migrations as cloud Supabase |
+| R14 | Redaction removes too much meaning, so cloud reasoning becomes useless | `RedactedFindingBrief` must preserve semantic service facts, sanitized request shape, observed behavior, constraints, and retrieved methodology without raw target values |
+| R15 | Cheap cloud model or evaluation loop creates runaway spend/latency | cc-switch enforces model profile, token budget, cost ceiling, concurrency, timeout, circuit breaker, and operator-visible usage records |
+| R16 | Cloud model gives a plausible plan that local execution cannot safely apply | UQLM checks grounding, Hermes rehydrates locally, scope guard and proof ladder enforce action policy, operator approves boundary-crossing steps |
 
 ---
 
