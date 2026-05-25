@@ -1681,7 +1681,9 @@ Regression scenario:
 - [ ] Add shadow-mode evaluation for candidate models
 - [ ] Add golden test set for core skills: recon summary, finding enrichment, exploit validation planning, report drafting, UQLM review
 - [ ] Add feedback loop from operator decisions into model capability records
-- [ ] Prove safe validation flow: high-impact hypothesis -> low-risk proof card -> operator-visible evidence -> no destructive action
+- [x] Prove safe validation flow: high-impact hypothesis -> low-risk proof card -> operator-visible evidence -> no destructive action
+  - `hermes-agent/tests/test_task_runner_proof_policy.py::test_high_impact_finding_full_flow_with_uqlm_and_rehydration` now proves a critical finding is reduced to a redacted cloud brief, UQLM reviews only redacted/parameterized evidence, Hermes emits an `active_read_only` proof card at proof rung 1, no quarantine/destructive task is created, and the local redaction registry rehydrates the finding for operator review.
+  - Fixed a sensitivity-classifier false positive where redacted placeholders such as `token=[SECRET_REF_1]` could be misread as raw secret residue after placeholder stripping; regression coverage keeps redacted proof-card URLs cloud-syncable while raw secrets still block.
 
 ---
 
