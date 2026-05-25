@@ -19,8 +19,10 @@ The core loop is:
 
 ```text
 raw local evidence
+  -> SecurityFactGraph/v1: typed hosts, services, auth boundaries, observations, evidence IDs
   -> LocalRedactionRegistry
   -> RedactedFindingBrief with useful semantics preserved
+  -> outbound cloud proxy schema check
   -> RAG/context pack: methodology, standards, public vuln intel, prior redacted proof patterns
   -> cloud or local strategist drafts a parameterized validation card
   -> UQLM checks grounding/consistency against the brief
@@ -33,6 +35,7 @@ Cloud models may be DeepSeek, OpenAI, Anthropic, OpenRouter, or another approved
 Cloud models may see:
 
 - `RedactedFindingBrief/v1` with stable refs such as `[IP_REF_1]` and `[SECRET_REF_1]`
+- `SecurityFactGraph/v1` summaries with typed pseudonyms and relationships, never raw identifiers
 - public CVE/CWE/KEV/EPSS/vendor/OWASP context
 - retrieved methodology and safe proof patterns
 - service metadata and sanitized request shape
@@ -46,6 +49,11 @@ Cloud models must not see by default:
 - authority to execute, approve, or escalate a proof step
 
 This is the solution this project is aiming for: **use the largest useful brain available, but keep the real target and execution authority local.**
+
+Two local safety components are mandatory before serious cloud use:
+
+- **Security Fact Graph builder:** converts raw scanner/log/HTTP evidence into typed facts before redaction so the cloud sees useful structure rather than meaningless placeholders.
+- **Outbound cloud proxy:** every model/RAG request passes a local schema and leak checker before it can leave the machine.
 
 ---
 
@@ -188,8 +196,39 @@ This is the privacy and model-routing contract for the whole workbench. It exist
 | Data class | Examples | Allowed destinations | Rule |
 |---|---|---|---|
 | `raw_local_only` | Real IPs, private domains, internal URLs, credentials, screenshots with sensitive text, customer names, request/response bodies containing secrets | Local SQLite, Hermes local process, local model, local UQLM, cc-switch local UI | Never send to cloud model or cloud database by default |
-| `redacted_cloud_ok` | `[DOMAIN_REF_1]`, `[IP_REF_1]`, normalized service metadata, CWE/CVE/EPSS/KEV, sanitized request shape, redacted reproduction context | Cloud model, Portal API, Supabase | Safe for cloud reasoning and dashboard storage |
+| `redacted_cloud_ok` | `[DOMAIN_REF_1]`, `[IP_REF_1]`, typed security facts, normalized service metadata, auth-boundary labels, CWE/CVE/EPSS/KEV, sanitized request shape, redacted reproduction context | Cloud model, Portal API, Supabase | Safe for cloud reasoning and dashboard storage |
 | `public` | Public CVE data, vendor advisory text, CISA KEV, EPSS, OWASP/CWE references | Any configured model or service | No local-only restriction |
+
+#### Security Fact Graph
+
+Raw evidence should be parsed into a typed graph before redaction. This preserves reasoning utility without leaking target identity.
+
+`SecurityFactGraph/v1` should represent:
+
+- assets as typed pseudonyms: web app, API, database, identity provider, storage bucket, worker, gateway, internal host
+- relationships: exposed-to-internet, talks-to, trusts, authenticates-through, same-origin-with, backend-of
+- observations: HTTP status, method, route class, header presence/absence, auth requirement, service family, version bucket, error taxonomy
+- evidence IDs: stable local references to screenshots, packets, logs, request/response bodies, and scanner output that remain local unless explicitly approved
+- constraints: engagement scope, allowed actions, rate limits, proof ladder ceiling, owned callback availability
+
+The graph must not contain raw private IPs, private hostnames, usernames, credentials, cookies, client names, exact internal paths, or raw request/response bodies in cloud-bound fields. Those values stay in local evidence storage and are referenced by evidence IDs or typed refs.
+
+This avoids the failure mode where redaction turns a finding into `[THING_REF_1] on [DOMAIN_REF_1]`, which is too vague for a cloud model to reason about.
+
+#### Outbound cloud proxy
+
+All cloud model, cloud embedding, cloud RAG, and cloud evaluation requests must pass through a local outbound proxy before leaving the machine.
+
+The proxy responsibilities are:
+
+- validate payload schema: only `RedactedFindingBrief/v1`, `SecurityFactGraph/v1` cloud-safe summary, public context, and approved prompt templates may leave
+- scan outbound payloads for raw private IPs, private domains, internal URLs, emails, phone numbers, credentials, cookies, bearer tokens, request/response bodies, and screenshots/OCR text
+- enforce provider profile rules: redacted-only, public-only, zero/raw-disclosure-approved, or disabled
+- enforce budget and stability controls: max input/output tokens, dollar ceiling, concurrency, timeout, retry limit, and circuit breaker
+- write an audit record with payload hash, provider, model, skill tag, data sensitivity, token/cost estimate, and policy decision
+- fail closed: reject or route to operator review if schema validation, leak detection, registry availability, or budget policy fails
+
+No code path should call a cloud model provider directly with ad hoc payloads. cc-switch chooses the model; the outbound proxy enforces what leaves.
 
 #### Local redaction registry
 
@@ -197,8 +236,10 @@ Hermes creates stable reference IDs before any cloud boundary:
 
 ```text
 Raw finding
+  -> SecurityFactGraph/v1
   -> LocalRedactionRegistry
   -> RedactedFindingBrief
+  -> outbound cloud proxy
   -> cloud-safe model prompt / Portal payload
 ```
 
@@ -353,6 +394,7 @@ Rules:
 - DoS findings should normally be validated through passive evidence, configuration review, lab reproduction, or strict non-impact limits, not production disruption.
 - Data extraction is not a proof method by default. Use metadata, counts, canaries, or operator-provided test records where possible.
 - Auth bypass validation should stop as soon as unauthorized access is demonstrated; do not browse deeper without approval.
+- Timing probes, brute-force-like enumeration, SQLi payload probes, directory brute forcing, and high-cardinality fuzzing are not automatically `active_read_only` just because they use `GET`. They require explicit rate limits, scope confirmation, and normally land in differential/canary/review territory unless the workflow pre-approves them.
 
 ### Model Capability Governance
 
@@ -417,6 +459,7 @@ The RAG output should be a compact context pack attached to the `RedactedFinding
 
 ```text
 RedactedFindingBrief/v1
+  + SecurityFactGraph/v1 cloud-safe summary
   + retrieved methodology snippets
   + relevant standards and public vuln intel
   + prior redacted proof cards with outcomes
@@ -436,6 +479,10 @@ Start small to avoid melting the laptop:
 
 - 20-30 golden cases first, not a huge grid.
 - 2 retrieval configs, 2 strategist models, 1 generation each.
+- Retrieval should start with hybrid search: embeddings + BM25 or equivalent lexical search.
+- Reranking should happen after retrieval, preferably locally when the original redacted graph gives better relevance signals.
+- Use section/sentence-aware chunks with metadata such as `capability_tags`, `affected_component`, `attack_phase`, `service_family`, `cwe`, and `proof_ladder_rung` instead of blind fixed windows where possible.
+- Keep the prompt compact: most probative evidence first, secondary context in the middle, required output schema and stop conditions near the end.
 - Run cloud strategist models such as DeepSeek only on redacted briefs and public/context packs.
 - Cache common prompt prefixes and retrieved context where the provider supports it.
 - Enforce per-run token, dollar, concurrency, and timeout budgets.
@@ -1775,6 +1822,8 @@ Regression scenario:
   - Implemented as compatibility constants/types in Hermes, Portal TypeScript, Supabase SQL checks, and cc-switch Rust routing policy. Long-term cleanup should move these into generated/shared schema artifacts.
 - [x] Add Supabase schema for `validation_cards`, `validation_attempts`, and `model_capability_records`
 - [ ] Add local Hermes storage for validation cards, validation attempts, local-only redaction registry, and sync queue payloads
+- [ ] Add `SecurityFactGraph/v1` builder in Hermes for typed hosts, services, auth boundaries, observations, evidence IDs, and scope constraints before redaction
+- [ ] Add local outbound cloud proxy/schema gate for all cloud model, embedding, RAG, and evaluation calls; reject raw-sensitive payloads before provider dispatch
 - [ ] Decide whether local PostgreSQL/Supabase-dev is required; if yes, add it to compose using the same canonical schema instead of a parallel schema
 - [ ] Add compatibility migration from existing `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`
 - [x] Implement proof ladder classification for proposed validation actions
@@ -1784,7 +1833,8 @@ Regression scenario:
 - [ ] Add Portal proof queue, approval queue, finding-detail proof panel, model capability dashboard, and audit timeline
 - [ ] Add model capability records per `model_identifier` + `skill_tag` + `data_sensitivity`
 - [ ] Add cloud-strategist provider profiles for cheap long-context models such as DeepSeek, with redacted-only input policy, token/cost ceilings, and no execution authority
-- [ ] Add RAG/context-pack builder for `RedactedFindingBrief` using methodology, public vuln intel, prior redacted proof cards, proof-ladder rules, and stop conditions
+- [ ] Add RAG/context-pack builder for `RedactedFindingBrief` + `SecurityFactGraph/v1` using methodology, public vuln intel, prior redacted proof cards, proof-ladder rules, and stop conditions
+- [ ] Add cloud resource governor: prompt caching policy, max tokens, spend cap, concurrency semaphore, timeout, retry/backoff, circuit breaker, and provider usage audit
 - [ ] Add shadow-mode evaluation for candidate models
 - [ ] Add golden test set for core skills: recon summary, finding enrichment, exploit validation planning, report drafting, UQLM review
 - [ ] Add RapidFire-compatible or lightweight context-engineering evaluation harness for redacted briefs so retrieval/model/prompt configs can be measured before promotion
@@ -1812,9 +1862,11 @@ Regression scenario:
 | R11 | Agent self-improvement mutates policy or model trust without review | Feedback may update scores only; policy/model promotion requires operator-reviewed change |
 | R12 | Local DB, Supabase, and Portal use different parameter names | Canonical enum contract, compatibility migration, schema/API tests across Python/Rust/TypeScript/SQL |
 | R13 | Local PostgreSQL added later with a divergent schema | Treat `schema.sql` as canonical; local Postgres/Supabase-dev must run the same migrations as cloud Supabase |
-| R14 | Redaction removes too much meaning, so cloud reasoning becomes useless | `RedactedFindingBrief` must preserve semantic service facts, sanitized request shape, observed behavior, constraints, and retrieved methodology without raw target values |
+| R14 | Redaction removes too much meaning, so cloud reasoning becomes useless | Build `SecurityFactGraph/v1` before redaction; preserve semantic service facts, relationships, sanitized request shape, observed behavior, constraints, evidence IDs, and retrieved methodology without raw target values |
 | R15 | Cheap cloud model or evaluation loop creates runaway spend/latency | cc-switch enforces model profile, token budget, cost ceiling, concurrency, timeout, circuit breaker, and operator-visible usage records |
 | R16 | Cloud model gives a plausible plan that local execution cannot safely apply | UQLM checks grounding, Hermes rehydrates locally, scope guard and proof ladder enforce action policy, operator approves boundary-crossing steps |
+| R17 | A developer bypasses redaction by calling a cloud provider directly | Outbound cloud proxy is the only allowed cloud egress path; schema/leak checks fail closed and audit every provider call |
+| R18 | RAG retrieves irrelevant or unsafe context and pollutes the proof card | Hybrid retrieval, metadata filters, reranking, context budgets, grounding checks, and golden evaluations decide which retrieval setup is approved |
 
 ---
 
