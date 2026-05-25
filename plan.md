@@ -1822,7 +1822,8 @@ Regression scenario:
   - Implemented as compatibility constants/types in Hermes, Portal TypeScript, Supabase SQL checks, and cc-switch Rust routing policy. Long-term cleanup should move these into generated/shared schema artifacts.
 - [x] Add Supabase schema for `validation_cards`, `validation_attempts`, and `model_capability_records`
 - [ ] Add local Hermes storage for validation cards, validation attempts, local-only redaction registry, and sync queue payloads
-- [ ] Add `SecurityFactGraph/v1` builder in Hermes for typed hosts, services, auth boundaries, observations, evidence IDs, and scope constraints before redaction
+- [x] Add `SecurityFactGraph/v1` builder in Hermes for typed hosts, services, auth boundaries, observations, evidence IDs, and scope constraints before redaction
+  - First pass implemented in `hermes-agent/scripts/offensive-research-portal-task-runner.py`: `RedactedFindingBrief/v1` now includes a cloud-safe graph with typed asset summary, route class, service family, auth boundary, header/status observations, local evidence IDs, and scope constraints. Focused proof-policy tests verify raw IPs/secrets/request bodies do not appear in the graph.
 - [ ] Add local outbound cloud proxy/schema gate for all cloud model, embedding, RAG, and evaluation calls; reject raw-sensitive payloads before provider dispatch
 - [ ] Decide whether local PostgreSQL/Supabase-dev is required; if yes, add it to compose using the same canonical schema instead of a parallel schema
 - [ ] Add compatibility migration from existing `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`
