@@ -1653,13 +1653,13 @@ Regression scenario:
 - [x] Convert Hermes analysis finding payloads to stable refs before enrichment/UQLM/Portal writes
 - [x] Add fail-closed sync-worker guard for raw private targets and obvious secrets
 - [x] Add Portal finding create/export boundary checks for raw private targets and obvious secrets
+- [x] Add Portal write-boundary tests for raw private IPs, domains, URLs, credentials, and PII
 - [x] Add `data_sensitivity` to Hermes -> cc-switch model-route requests
   - Hermes now includes optional `data_sensitivity` and `validation_action_risk` fields when asking cc-switch for a model route. cc-switch enforces the sensitivity boundary before provider selection.
 - [x] Enforce `raw_local_only` in cc-switch so cloud providers cannot receive raw sensitive payloads
   - Implemented in the shared Rust router and exercised through the headless router tests.
 - [ ] Add local rehydration in cc-switch or CLI for operator-only manual review/testing
   - Core helper exists in Hermes; user-facing operator view is not wired yet.
-- [ ] Add Portal write-boundary tests for raw private IPs, domains, URLs, credentials, and PII
 - [ ] Add UQLM tests for redacted reproduction templates
 - [ ] Prove high-impact finding flow: raw local evidence -> redacted cloud reasoning -> UQLM score -> operator review -> local rehydrated safe test
 
