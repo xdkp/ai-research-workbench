@@ -1540,14 +1540,14 @@ Tests:
 
 Goal: make cloud-safe reasoning useful without leaking raw evidence.
 
-Status as of 2026-05-25: first Hermes boundary is implemented for analysis findings. The task runner redacts raw finding values before Fabric enrichment, UQLM verification, Portal finding writes, validation-card sync, quarantine child-task creation, receipt reports, and error events. The raw mapping is stored locally only in the redaction registry. The sync worker now fails closed when a queued payload still contains raw private targets or obvious secrets and self-initializes the local SQLite sync schema when `findings.db` exists without required tables. Portal finding creation rejects raw private/secret payloads, finding markdown export fails closed, and report generation is blocked if stored engagement/finding content still contains raw private target or secret material. Remaining work is to formalize `RedactedFindingBrief`, wire operator UI/CLI rehydration, and prove the offline queue drain against the real Supabase schema.
+Status as of 2026-05-25: first Hermes boundary is implemented for analysis findings. The task runner redacts raw finding values before Fabric enrichment, UQLM verification, Portal finding writes, validation-card sync, quarantine child-task creation, receipt reports, and error events. `RedactedFindingBrief/v1` is now the Hermes analysis DTO for Fabric, UQLM, and Portal-bound finding metadata; it copies only allowlisted fields and keeps arbitrary raw request/response material local. The raw mapping is stored locally only in the redaction registry. The sync worker now fails closed when a queued payload still contains raw private targets or obvious secrets and self-initializes the local SQLite sync schema when `findings.db` exists without required tables. Portal finding creation rejects raw private/secret payloads, finding markdown export fails closed, and report generation is blocked if stored engagement/finding content still contains raw private target or secret material. Remaining work is to wire operator UI/CLI rehydration, add any needed Portal TypeScript contract validation for the brief schema, and prove the offline queue drain against the real Supabase schema.
 
 Hermes/local storage changes:
 
 1. Add local redaction registry table/file.
    - **Implemented** as local JSON file via `LocalRedactionRegistry`.
 2. Convert raw values to stable refs before cloud model calls or Portal writes.
-   - **Implemented for analysis findings** before enrichment, UQLM, Portal writes, proof cards, and quarantine tasks.
+   - **Implemented for analysis findings** before enrichment, UQLM, Portal writes, proof cards, and quarantine tasks. Hermes now builds `RedactedFindingBrief/v1` before Fabric/UQLM/Portal boundaries.
 3. Store raw mapping locally only.
    - **Implemented**; Portal receives refs, not registry values.
 4. Add local rehydration helper for cc-switch/CLI operator view.
@@ -1648,7 +1648,8 @@ Regression scenario:
 ### Release D — Sensitive Cloud Assistance
 - [x] Define and implement `LocalRedactionRegistry` for stable ref mapping
   - First implementation is local JSON with stable `IP_REF`, `DOMAIN_REF`, and `SECRET_REF` mappings plus rehydration helper.
-- [ ] Define `RedactedFindingBrief` as the only cloud-model and Portal-safe finding DTO
+- [x] Define `RedactedFindingBrief` as the Hermes analysis DTO for cloud-model and Portal-safe finding flow
+  - Portal TypeScript schema validation for the brief remains optional hardening if this DTO becomes a public API contract.
 - [x] Convert Hermes analysis finding payloads to stable refs before enrichment/UQLM/Portal writes
 - [x] Add fail-closed sync-worker guard for raw private targets and obvious secrets
 - [x] Add Portal finding create/export boundary checks for raw private targets and obvious secrets
