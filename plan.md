@@ -1824,7 +1824,8 @@ Regression scenario:
 - [ ] Add local Hermes storage for validation cards, validation attempts, local-only redaction registry, and sync queue payloads
 - [x] Add `SecurityFactGraph/v1` builder in Hermes for typed hosts, services, auth boundaries, observations, evidence IDs, and scope constraints before redaction
   - First pass implemented in `hermes-agent/scripts/offensive-research-portal-task-runner.py`: `RedactedFindingBrief/v1` now includes a cloud-safe graph with typed asset summary, route class, service family, auth boundary, header/status observations, local evidence IDs, and scope constraints. Focused proof-policy tests verify raw IPs/secrets/request bodies do not appear in the graph.
-- [ ] Add local outbound cloud proxy/schema gate for all cloud model, embedding, RAG, and evaluation calls; reject raw-sensitive payloads before provider dispatch
+- [x] Add local outbound cloud proxy/schema gate for all cloud model, embedding, RAG, and evaluation calls; reject raw-sensitive payloads before provider dispatch
+  - First pass implemented in Hermes as provider-agnostic `validate_outbound_cloud_payload()`: validates `RedactedFindingBrief/v1` / `SecurityFactGraph/v1`, requires a graph for redacted briefs, rejects `raw_local_only`, scans for private IPs/internal domains/secrets/bearer tokens/PII/raw HTTP requests, enforces payload byte budget, records an audit hash, and is wired before Fabric enrichment plus the UQLM input path. Future RAG/embedding calls must reuse this gate.
 - [ ] Decide whether local PostgreSQL/Supabase-dev is required; if yes, add it to compose using the same canonical schema instead of a parallel schema
 - [ ] Add compatibility migration from existing `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`
 - [x] Implement proof ladder classification for proposed validation actions
