@@ -1828,7 +1828,8 @@ Regression scenario:
 - [x] Add local outbound cloud proxy/schema gate for all cloud model, embedding, RAG, and evaluation calls; reject raw-sensitive payloads before provider dispatch
   - First pass implemented in Hermes as provider-agnostic `validate_outbound_cloud_payload()`: validates `RedactedFindingBrief/v1` / `SecurityFactGraph/v1`, requires a graph for redacted briefs, rejects `raw_local_only`, scans for private IPs/internal domains/secrets/bearer tokens/PII/raw HTTP requests, enforces payload byte budget, records an audit hash, and is wired before Fabric enrichment plus the UQLM input path. Future RAG/embedding calls must reuse this gate.
 - [ ] Decide whether local PostgreSQL/Supabase-dev is required; if yes, add it to compose using the same canonical schema instead of a parallel schema
-- [ ] Add compatibility migration from existing `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`
+- [x] Add compatibility migration from existing `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`
+  - First pass implemented in Portal: SQL backfills `validation_action_risk` and `proof_ladder_rung` for existing `agent_tasks` and `workflow_steps`; task, validation-card, workflow-plan, and workflow-template API paths normalize legacy `action_class` / `risk_level` into proof-risk fields while preserving legacy fields for older Hermes/workflow callers. TypeScript keeps new workflow columns optional during the additive migration window.
 - [x] Implement proof ladder classification for proposed validation actions
 - [x] Update quarantine logic to gate `validation_action_risk`, not only `vulnerability_severity`
 - [x] Add Portal APIs for validation cards, validation attempts, and model capability records

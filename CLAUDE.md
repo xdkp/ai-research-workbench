@@ -137,9 +137,9 @@ Completed in the current Release E path:
 - Outbound cloud proxy/schema gate before Fabric/UQLM/cloud model calls.
 - Local Hermes proof storage: `validation_cards_local`, `validation_attempts_local`, local-only `redaction_registry`, and `sync_queue` payloads.
 - Sync worker reconciliation for offline-drained validation-card and validation-attempt queue rows.
+- Compatibility migration from legacy `action_class` / `risk_level` into proof-risk fields.
 
 Next work:
-- Add compatibility migration from legacy `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`.
 - Continue Portal/cc-switch proof queue and model capability governance work after the storage and migration layer is stable.
 
 UQLM is a quality gate, not a truth oracle. It reduces hallucination/noise by
