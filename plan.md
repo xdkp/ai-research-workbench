@@ -1822,26 +1822,28 @@ Regression scenario:
   - Implemented as compatibility constants/types in Hermes, Portal TypeScript, Supabase SQL checks, and cc-switch Rust routing policy. Long-term cleanup should move these into generated/shared schema artifacts.
 - [x] Add Supabase schema for `validation_cards`, `validation_attempts`, and `model_capability_records`
 - [x] Add local Hermes storage for validation cards, validation attempts, local-only redaction registry, and sync queue payloads
-  - First pass implemented in Hermes SQLite at `PENTEST_DB_PATH`: `validation_cards_local`, `validation_attempts_local`, `redaction_registry`, and `sync_queue` are self-healed by the task runner and sync worker. Validation cards are persisted locally before Portal sync, cloud-safe card payloads are queued with stable fingerprints, raw-local-only cards stay local-only, and the local redaction registry is mirrored into SQLite for operator rehydration/recovery. `pentest-ai-agents/db/schema.sql` now defines the same local tables for fresh DB initialization.
+  - First pass implemented in Hermes SQLite at `PENTEST_DB_PATH`: `validation_cards_local`, `validation_attempts_local`, `redaction_registry`, and `sync_queue` are self-healed by the task runner and sync worker. Validation cards are persisted locally before Portal sync, cloud-safe card payloads are queued with stable fingerprints, raw-local-only cards stay local-only, and the local redaction registry is mirrored into SQLite for operator rehydration/recovery. `pentest-ai-agents/db/schema.sql` now defines the same local tables for fresh DB initialization. Sync worker success now reconciles offline-drained validation-card and validation-attempt queue rows back to local `sync_status='synced'`.
 - [x] Add `SecurityFactGraph/v1` builder in Hermes for typed hosts, services, auth boundaries, observations, evidence IDs, and scope constraints before redaction
   - First pass implemented in `hermes-agent/scripts/offensive-research-portal-task-runner.py`: `RedactedFindingBrief/v1` now includes a cloud-safe graph with typed asset summary, route class, service family, auth boundary, header/status observations, local evidence IDs, and scope constraints. Focused proof-policy tests verify raw IPs/secrets/request bodies do not appear in the graph.
 - [x] Add local outbound cloud proxy/schema gate for all cloud model, embedding, RAG, and evaluation calls; reject raw-sensitive payloads before provider dispatch
   - First pass implemented in Hermes as provider-agnostic `validate_outbound_cloud_payload()`: validates `RedactedFindingBrief/v1` / `SecurityFactGraph/v1`, requires a graph for redacted briefs, rejects `raw_local_only`, scans for private IPs/internal domains/secrets/bearer tokens/PII/raw HTTP requests, enforces payload byte budget, records an audit hash, and is wired before Fabric enrichment plus the UQLM input path. Future RAG/embedding calls must reuse this gate.
 - [ ] Decide whether local PostgreSQL/Supabase-dev is required; if yes, add it to compose using the same canonical schema instead of a parallel schema
-- [ ] Add compatibility migration from existing `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`
+- [x] Add compatibility migration from existing `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`
+  - First pass implemented in Portal: SQL backfills `validation_action_risk` and `proof_ladder_rung` for existing `agent_tasks` and `workflow_steps`; task, validation-card, workflow-plan, and workflow-template API paths normalize legacy `action_class` / `risk_level` into proof-risk fields while preserving legacy fields for older Hermes/workflow callers. TypeScript keeps new workflow columns optional during the additive migration window.
 - [x] Implement proof ladder classification for proposed validation actions
 - [x] Update quarantine logic to gate `validation_action_risk`, not only `vulnerability_severity`
 - [x] Add Portal APIs for validation cards, validation attempts, and model capability records
-- [ ] Add proof-card UI in cc-switch/Portal for quick operator review
-- [ ] Add Portal proof queue, approval queue, finding-detail proof panel, model capability dashboard, and audit timeline
-- [ ] Add model capability records per `model_identifier` + `skill_tag` + `data_sensitivity`
+- [x] Add proof-card UI in cc-switch/Portal for quick operator review
+- [x] Add Portal proof queue, approval queue, finding-detail proof panel, model capability dashboard, and audit timeline
+- [x] Add model capability records per `model_identifier` + `skill_tag` + `data_sensitivity`
+- [x] Add feedback loop from operator decisions into model capability records
 - [ ] Add cloud-strategist provider profiles for cheap long-context models such as DeepSeek, with redacted-only input policy, token/cost ceilings, and no execution authority
 - [ ] Add RAG/context-pack builder for `RedactedFindingBrief` + `SecurityFactGraph/v1` using methodology, public vuln intel, prior redacted proof cards, proof-ladder rules, and stop conditions
 - [ ] Add cloud resource governor: prompt caching policy, max tokens, spend cap, concurrency semaphore, timeout, retry/backoff, circuit breaker, and provider usage audit
 - [ ] Add shadow-mode evaluation for candidate models
 - [ ] Add golden test set for core skills: recon summary, finding enrichment, exploit validation planning, report drafting, UQLM review
 - [ ] Add RapidFire-compatible or lightweight context-engineering evaluation harness for redacted briefs so retrieval/model/prompt configs can be measured before promotion
-- [ ] Add feedback loop from operator decisions into model capability records
+- [x] Add feedback loop from operator decisions into model capability records
 - [x] Prove safe validation flow: high-impact hypothesis -> low-risk proof card -> operator-visible evidence -> no destructive action
   - `hermes-agent/tests/test_task_runner_proof_policy.py::test_high_impact_finding_full_flow_with_uqlm_and_rehydration` now proves a critical finding is reduced to a redacted cloud brief, UQLM reviews only redacted/parameterized evidence, Hermes emits an `active_read_only` proof card at proof rung 1, no quarantine/destructive task is created, and the local redaction registry rehydrates the finding for operator review.
   - Fixed a sensitivity-classifier false positive where redacted placeholders such as `token=[SECRET_REF_1]` could be misread as raw secret residue after placeholder stripping; regression coverage keeps redacted proof-card URLs cloud-syncable while raw secrets still block.
