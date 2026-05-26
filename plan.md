@@ -1833,16 +1833,17 @@ Regression scenario:
 - [x] Implement proof ladder classification for proposed validation actions
 - [x] Update quarantine logic to gate `validation_action_risk`, not only `vulnerability_severity`
 - [x] Add Portal APIs for validation cards, validation attempts, and model capability records
-- [ ] Add proof-card UI in cc-switch/Portal for quick operator review
-- [ ] Add Portal proof queue, approval queue, finding-detail proof panel, model capability dashboard, and audit timeline
-- [ ] Add model capability records per `model_identifier` + `skill_tag` + `data_sensitivity`
+- [x] Add proof-card UI in cc-switch/Portal for quick operator review
+- [x] Add Portal proof queue, approval queue, finding-detail proof panel, model capability dashboard, and audit timeline
+- [x] Add model capability records per `model_identifier` + `skill_tag` + `data_sensitivity`
+- [x] Add feedback loop from operator decisions into model capability records
 - [ ] Add cloud-strategist provider profiles for cheap long-context models such as DeepSeek, with redacted-only input policy, token/cost ceilings, and no execution authority
 - [ ] Add RAG/context-pack builder for `RedactedFindingBrief` + `SecurityFactGraph/v1` using methodology, public vuln intel, prior redacted proof cards, proof-ladder rules, and stop conditions
 - [ ] Add cloud resource governor: prompt caching policy, max tokens, spend cap, concurrency semaphore, timeout, retry/backoff, circuit breaker, and provider usage audit
 - [ ] Add shadow-mode evaluation for candidate models
 - [ ] Add golden test set for core skills: recon summary, finding enrichment, exploit validation planning, report drafting, UQLM review
 - [ ] Add RapidFire-compatible or lightweight context-engineering evaluation harness for redacted briefs so retrieval/model/prompt configs can be measured before promotion
-- [ ] Add feedback loop from operator decisions into model capability records
+- [x] Add feedback loop from operator decisions into model capability records
 - [x] Prove safe validation flow: high-impact hypothesis -> low-risk proof card -> operator-visible evidence -> no destructive action
   - `hermes-agent/tests/test_task_runner_proof_policy.py::test_high_impact_finding_full_flow_with_uqlm_and_rehydration` now proves a critical finding is reduced to a redacted cloud brief, UQLM reviews only redacted/parameterized evidence, Hermes emits an `active_read_only` proof card at proof rung 1, no quarantine/destructive task is created, and the local redaction registry rehydrates the finding for operator review.
   - Fixed a sensitivity-classifier false positive where redacted placeholders such as `token=[SECRET_REF_1]` could be misread as raw secret residue after placeholder stripping; regression coverage keeps redacted proof-card URLs cloud-syncable while raw secrets still block.
