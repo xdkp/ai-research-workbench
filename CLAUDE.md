@@ -30,6 +30,19 @@ This is a **meta-repo** at `/mnt/develop/AI_Research`. The root tracks only work
 
 Child repos are in `.gitignore`. Do not force them into the root repo.
 
+## Project Goal
+
+Build a **local-first pentest workbench** where the operator stays in control.
+Hermes executes tasks, Fabric drafts/enriches reports, cc-switch chooses the right
+model for each step, Portal stores and reviews redacted workflow records, and
+UQLM helps detect hallucinated or weak outputs. Cloud models may assist with
+heavy reasoning only through redacted, schema-gated payloads; raw sensitive
+evidence stays local unless the operator explicitly approves sharing.
+
+The operator is the final authority. Models propose, verify, summarize, and
+reduce search/proof burden; they do not self-authorize destructive actions,
+data access, denial-of-service behavior, or out-of-scope testing.
+
 ## System of Record
 
 `offensive-research-portal` is the single source of truth for security workflow data. The pipeline is:
@@ -39,7 +52,11 @@ scope -> approved task -> execution evidence -> structured finding -> operator t
 ```
 
 **Hard rules:**
-- Do not create a second findings database outside `offensive-research-portal`.
+- Do not create a second cloud/workflow source of truth outside `offensive-research-portal`.
+- Local SQLite stores are allowed only for operational state: crash recovery,
+  sync queues, local-only redaction registry, proof-card drafts, validation
+  attempts, scanner cache, and offline retry. These local tables are not the
+  canonical reporting system.
 - Do not let Fabric, Hermes, or cc-switch become the source of truth for security findings.
 - `SUPABASE_SERVICE_ROLE_KEY` must never appear in browser/client code. All Supabase access goes through server-side Next.js API routes.
 - RLS deny-all on all Supabase tables; only `service_role` bypasses.
@@ -93,7 +110,7 @@ ollama list         # Check if Ollama daemon is reachable
 ### Agent bridge
 - **Hermes gateway** (`hermes-agent/gateway/`): Claims tasks from offensive-research-portal agent API (`POST /api/agent/tasks/claim`), executes them, posts events and generated reports. Uses `AGENT_TOKEN` for auth.
 - **Heartbeat protocol**: Hermes posts to `POST /api/agent/heartbeat` with agent state (idle/busy/paused/waiting_approval). No heartbeat within 60s → agent marked stale.
-- **Task execution modes**: `receipt` (safe default, writes receipt report), `analysis` (in progress, enrichment pipeline).
+- **Task execution modes**: `receipt` (safe default, writes receipt report), `analysis` (proof-driven enrichment pipeline with redacted cloud briefs, UQLM checks, validation cards, and local proof storage).
 
 ### Operator Authority Policy (non-negotiable)
 - Hermes may propose HIGH/CRITICAL actions but requires explicit operator approval before execution.
@@ -105,6 +122,29 @@ ollama list         # Check if Ollama daemon is reachable
 - Primary workflow: `docker compose up` bootstraps local runtime (cc-switch, Fabric, Hermes, scanners, local models).
 - Portal can be optionally hosted (Vercel) for read-only reports and operator console.
 - Execution components (model runtimes, PoC validation, Fabric patterns, Hermes agents) remain under operator control on local infrastructure.
+- Cloud assistance is allowed only after the outbound cloud boundary validates a
+  redacted DTO such as `RedactedFindingBrief/v1` with `SecurityFactGraph/v1`.
+  Raw IPs, internal domains, secrets, bearer tokens, raw HTTP requests, and PII
+  must fail closed before provider dispatch or Portal upload.
+
+## Current Release Focus
+
+Active implementation is **Release E — Proof-Driven Automation** from `plan.md`.
+
+Completed in the current Release E path:
+- Safe validation flow proof: high-impact finding → low-risk proof card → operator-visible evidence → no destructive action.
+- `SecurityFactGraph/v1` builder for cloud-safe structured context.
+- Outbound cloud proxy/schema gate before Fabric/UQLM/cloud model calls.
+- Local Hermes proof storage: `validation_cards_local`, `validation_attempts_local`, local-only `redaction_registry`, and `sync_queue` payloads.
+- Sync worker reconciliation for offline-drained validation-card and validation-attempt queue rows.
+
+Next work:
+- Add compatibility migration from legacy `action_class` / `risk_level` to `validation_action_risk` / `vulnerability_severity`.
+- Continue Portal/cc-switch proof queue and model capability governance work after the storage and migration layer is stable.
+
+UQLM is a quality gate, not a truth oracle. It reduces hallucination/noise by
+checking consistency and grounding, but operator review and policy boundaries
+remain decisive.
 
 ## Key Files
 
@@ -150,9 +190,19 @@ ollama list         # Check if Ollama daemon is reachable
 
 These rules apply to Claude Code when working on any project in this workspace. They ensure every change is tested, verified, and safe before merge.
 
+### Current workflow for this workspace
+
+1. Work on a feature branch for each repo; do not mix unrelated repo changes into one push.
+2. Before pushing, run the relevant local verification for the touched repo(s) and fix failures locally.
+3. Push only to the `xdkp` fork remotes for child repos.
+4. Open a PR to trigger CI, then check the resulting GitHub Actions run and fix any failures before moving on.
+5. Keep root docs updates in the root repo and child-repo changes in the child repo unless the change truly spans both.
+6. Use `apply_patch` for text-file edits. Do not use notebook/file-generation tools to modify normal repository source or docs files.
+7. When a task depends on prior local state, preserve untracked scratch files unless the user explicitly asks to remove them.
+
 ### Branch and commit rules
 
-1. **Never push directly to `main` or `develop`.** Always work in a feature branch.
+1. **Default: never push directly to `main` or `develop`.** Always work in a feature branch. Direct main/develop pushes are allowed only when the user explicitly overrides this for a specific release, hotfix, or Vercel/main test.
 2. **Create a new commit for each completed feature or fix.** Do not amend published commits.
 3. **Never skip hooks** (`--no-verify`, `--no-gpg-sign`) unless explicitly instructed.
 4. **Write conventional commit messages.** Subject under 70 characters, body explaining WHY.
